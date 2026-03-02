@@ -361,18 +361,20 @@ const ServicesPage: React.FC = () => {
         </button>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => alert("AI Support (hook up later)")}
-            className="rounded-full bg-violet-600 px-4 py-2 text-sm font-bold text-white shadow hover:bg-violet-700"
-          >
-            🤖 AI Support
-          </button>
+          
 
           <button
             onClick={() => alert("Finish (navigate to next step later)")}
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
           >
             Finish
+          </button>
+
+          <button
+            onClick={() => alert("AI Support (hook up later)")}
+            className="rounded-full bg-violet-600 px-4 py-2 text-sm font-bold text-white shadow hover:bg-violet-700"
+          >
+            🤖 AI Support
           </button>
         </div>
       </div>

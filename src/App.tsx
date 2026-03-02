@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
+import ServicePage from "./pages/ServicePage";
 
 function App() {
   return (
@@ -21,6 +22,16 @@ function App() {
           element={
             <MainLayout>
               <CreateEventPage />
+            </MainLayout>
+          }
+        />
+
+
+ <Route
+          path="/services"
+          element={
+            <MainLayout>
+              <ServicePage />
             </MainLayout>
           }
         />

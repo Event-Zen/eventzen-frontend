@@ -42,8 +42,11 @@ function App() {
           element={
             <MainLayout>
               <AddServicePage />
+            </MainLayout>
+          }
+        />
 
- <Route
+        <Route
           path="/services"
           element={
             <MainLayout>

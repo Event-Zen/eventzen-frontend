@@ -5,11 +5,19 @@ const Header = () => {
   return (
     <header className="w-full bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-
+       
         {/* Logo */}
         <div className="flex items-center space-x-2">
-          <Link to="/" className="text-2xl font-extrabold tracking-wide">
-            EVENT<span className="text-blue-500">ZEN</span>
+          <Link
+            to="/"
+            className="group transition-all duration-300 transform hover:-translate-y-0.5"
+          >
+            <h1 className="text-2xl font-extrabold tracking-wide group-hover:text-gray-700">
+              EVENT
+              <span className="text-blue-500 transition-colors group-hover:text-blue-600">
+                ZEN
+              </span>
+            </h1>
           </Link>
         </div>
 
@@ -27,7 +35,6 @@ const Header = () => {
 
         {/* Navigation */}
         <nav className="flex items-center space-x-6 text-sm font-medium text-gray-700">
-
           <Link to="/" className="hover:text-blue-500 transition">
             Find Events
           </Link>
@@ -55,7 +62,6 @@ const Header = () => {
           >
             Sign Up
           </Link>
-
         </nav>
       </div>
     </header>

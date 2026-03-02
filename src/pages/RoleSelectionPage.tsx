@@ -32,7 +32,7 @@ export default function RoleSelectionPage({ onSelectRole, onLogin }: Props) {
   };
 
   return (
-    <section className="relative bg-white overflow-hidden min-h-screen">
+    <section className="relative bg-gradient-to-br from-blue-50 via-white to-blue-100 overflow-hidden min-h-screen">
       <CornerSquares position="top-10 left-10" colorClass="border-blue-400" />
       <CornerSquares position="top-10 right-10" colorClass="border-blue-400" />
       <CornerSquares
@@ -51,11 +51,11 @@ export default function RoleSelectionPage({ onSelectRole, onLogin }: Props) {
       <div className="relative max-w-6xl mx-auto px-6 py-20 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-xl">
           <GradientCard>
-            <h1 className="mt-6 text-center text-2xl md:text-3xl font-serif text-gray-900 leading-snug">
-              Select Account
+            <h1 className="mt-6 text-center text-2xl md:text-3xl font-serif text-black-900 leading-snug">
+              SELECT ACCOUNT
             </h1>
             <p className="mt-3 text-center text-sm text-gray-500">
-              Choose your role to continue with EventZen.
+              Choose your role to continue with Sign Up.
             </p>
 
             <div className="mt-10 flex flex-col gap-4">
@@ -114,7 +114,7 @@ function RoleButton({
       type="button"
       onClick={onClick}
       className="w-full rounded-xl border border-blue-100 bg-blue-50/50 px-6 py-4 text-center text-sm font-semibold text-gray-900
-                 hover:bg-blue-100/60 hover:border-blue-200
+                 hover:bg-blue-300/60 hover:border-blue-700
                  shadow-[0_10px_25px_rgba(37,99,235,0.08)]
                  focus:outline-none focus:ring-2 focus:ring-blue-300 cursor-pointer"
     >

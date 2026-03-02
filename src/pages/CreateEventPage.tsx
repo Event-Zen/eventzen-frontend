@@ -17,7 +17,8 @@ type FormState = {
     description: string;
     location: string;
     date: Date | null;
-    time: string; // "HH:MM"
+    startTime: string; // "HH:MM"
+    endTime: string;   // "HH:MM"
     eventMode: EventType;
     eventType: string;
     capacity: string;
@@ -168,7 +169,8 @@ export default function CreateEventPage() {
         description: "",
         location: "",
         date: null,
-        time: "",
+        startTime: "",
+        endTime: "",
         eventMode: "physical",
         eventType: "Selection",
         capacity: "",
@@ -256,12 +258,35 @@ export default function CreateEventPage() {
                             {/* Time */}
                             <div>
                                 <label className="block text-xs text-slate-700">Time</label>
-                                <input
-                                    type="time"
-                                    value={form.time}
-                                    onChange={(e) => setField("time", e.target.value)}
-                                    className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-400"
-                                />
+
+                                <div className="mt-1 grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-[11px] text-slate-500">From</label>
+                                        <input
+                                            type="time"
+                                            value={form.startTime}
+                                            onChange={(e) => setField("startTime", e.target.value)}
+                                            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-400"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[11px] text-slate-500">To</label>
+                                        <input
+                                            type="time"
+                                            value={form.endTime}
+                                            onChange={(e) => setField("endTime", e.target.value)}
+                                            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-400"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Optional small validation message */}
+                                {form.startTime && form.endTime && form.endTime <= form.startTime && (
+                                    <p className="mt-2 text-xs text-red-600">
+                                        End time should be later than start time.
+                                    </p>
+                                )}
                             </div>
 
                             {/* Physical / Virtual */}
@@ -378,7 +403,7 @@ export default function CreateEventPage() {
                                     <div className="flex justify-between">
                                         <span>Event Duration</span>
                                         <span className="font-semibold text-slate-900">
-                                            {form.time ? "Custom Time Set" : "Not Set"}
+                                            {form.startTime && form.endTime ? `${form.startTime} - ${form.endTime}` : "Not Set"}
                                         </span>
                                     </div>
 
@@ -467,10 +492,8 @@ export default function CreateEventPage() {
                                     )}
 
                                     {/* Time Suggestion */}
-                                    {!form.time && (
-                                        <p>
-                                            ⏰ Setting a clear event time increases trust and conversion rates.
-                                        </p>
+                                    {(!form.startTime || !form.endTime) && (
+                                        <p>⏰ Setting a clear start and end time increases trust and conversion rates.</p>
                                     )}
 
                                     {/* Weekend Suggestion */}

@@ -194,7 +194,9 @@ export default function CreateEventPage() {
             date: form.date ? toYMD(form.date) : null,
         };
         console.log("Next payload:", payload);
-        alert("Next (demo). You can route to step-2 or submit to backend.");
+        // alert("Next (demo). You can route to step-2 or submit to backend.");
+        // Redirect to services page
+        navigate("/services");
     };
 
     return (

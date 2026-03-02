@@ -334,7 +334,7 @@ export default function CreateEventPage() {
                     </div>
 
 
-                    
+
 
                     {/* Right side for smart insights */}
                     <div className="hidden lg:block lg:w-[420px] pl-10">
@@ -388,16 +388,22 @@ export default function CreateEventPage() {
                                     <div className="flex justify-between">
                                         <span>Capacity Status</span>
                                         <span
-                                            className={`font-semibold ${form.capacity && Number(form.capacity) > 500
-                                                    ? "text-red-600"
-                                                    : "text-green-600"
+                                            className={`font-semibold ${!form.capacity
+                                                    ? "text-slate-500"
+                                                    : Number(form.capacity) <= 100
+                                                        ? "text-green-600"
+                                                        : Number(form.capacity) <= 500
+                                                            ? "text-blue-600"
+                                                            : "text-red-600"
                                                 }`}
                                         >
-                                            {form.capacity
-                                                ? Number(form.capacity) > 500
-                                                    ? "Large Scale Event"
-                                                    : "Standard Event"
-                                                : "Not Set"}
+                                            {!form.capacity
+                                                ? "Not Set"
+                                                : Number(form.capacity) <= 100
+                                                    ? "Small Event"
+                                                    : Number(form.capacity) <= 500
+                                                        ? "Standard Event"
+                                                        : "Large Scale Event"}
                                         </span>
                                     </div>
                                 </div>

@@ -389,12 +389,12 @@ export default function CreateEventPage() {
                                         <span>Capacity Status</span>
                                         <span
                                             className={`font-semibold ${!form.capacity
-                                                    ? "text-slate-500"
-                                                    : Number(form.capacity) <= 100
-                                                        ? "text-green-600"
-                                                        : Number(form.capacity) <= 500
-                                                            ? "text-blue-600"
-                                                            : "text-red-600"
+                                                ? "text-slate-500"
+                                                : Number(form.capacity) <= 100
+                                                    ? "text-green-600"
+                                                    : Number(form.capacity) <= 500
+                                                        ? "text-blue-600"
+                                                        : "text-red-600"
                                                 }`}
                                         >
                                             {!form.capacity
@@ -409,23 +409,71 @@ export default function CreateEventPage() {
                                 </div>
                             </div>
 
-                            {/* AI Suggestion Box */}
+                            {/* Smart Suggestion Box */}
                             <div className="rounded-2xl border bg-violet-50 p-6">
-                                <h4 className="text-sm text-center font-semibold text-violet-900 mb-3">
-                                    AI Suggestion
+                                <h4 className="text-sm text-center font-semibold text-violet-900 mb-4">
+                                    Smart Suggestions
                                 </h4>
 
-                                <p className="text-xs text-violet-800 leading-relaxed">
-                                    {form.ticketPrice && Number(form.ticketPrice) > 0
-                                        ? "Consider offering early bird discounts to increase initial registrations."
-                                        : "Free events usually attract higher engagement. You may monetize via sponsors."}
-                                </p>
+                                <div className="space-y-3 text-xs text-violet-800 leading-relaxed">
 
-                                {form.eventMode === "virtual" && (
-                                    <p className="mt-3 text-xs text-violet-800">
-                                        Virtual events perform best between 6PM - 9PM.
+                                    {/* Pricing Suggestion */}
+                                    <p>
+                                        {form.ticketPrice && Number(form.ticketPrice) > 0
+                                            ? "💡 Consider offering early bird discounts to increase initial registrations."
+                                            : "💡 Free events usually attract higher engagement. You may monetize via sponsors or premium add-ons."}
                                     </p>
-                                )}
+
+                                    {/* Capacity Suggestion */}
+                                    {form.capacity && Number(form.capacity) <= 50 && (
+                                        <p>
+                                            👥 Small events perform better with personalized engagement and networking sessions.
+                                        </p>
+                                    )}
+
+                                    {form.capacity && Number(form.capacity) > 300 && (
+                                        <p>
+                                            📣 Large capacity events benefit from strong marketing and early promotions.
+                                        </p>
+                                    )}
+
+                                    {/* Virtual vs Physical */}
+                                    {form.eventMode === "virtual" && (
+                                        <p>
+                                            🌐 Virtual events perform best between 6PM - 9PM and should include interactive elements like polls.
+                                        </p>
+                                    )}
+
+                                    {form.eventMode === "physical" && (
+                                        <p>
+                                            📍 Physical events require clear parking and venue details to improve attendance.
+                                        </p>
+                                    )}
+
+                                    {/* Time Suggestion */}
+                                    {!form.time && (
+                                        <p>
+                                            ⏰ Setting a clear event time increases trust and conversion rates.
+                                        </p>
+                                    )}
+
+                                    {/* Weekend Suggestion */}
+                                    {form.date && (
+                                        <p>
+                                            📅 {form.date.getDay() === 0 || form.date.getDay() === 6
+                                                ? "Weekend events generally attract higher attendance."
+                                                : "Weekday events work best for professional audiences."}
+                                        </p>
+                                    )}
+
+                                    {/* Event Type Suggestion */}
+                                    {form.eventType !== "Selection" && (
+                                        <p>
+                                            🏷 {form.eventType} events perform better when you clearly state the benefits attendees will gain.
+                                        </p>
+                                    )}
+
+                                </div>
                             </div>
 
                         </div>

@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
 import AddServicePage from "./pages/AddServicesPage";
+import ServicePage from "./pages/ServicePage";
 
 function App() {
   return (
@@ -41,6 +42,12 @@ function App() {
           element={
             <MainLayout>
               <AddServicePage />
+
+ <Route
+          path="/services"
+          element={
+            <MainLayout>
+              <ServicePage />
             </MainLayout>
           }
         />

@@ -3,6 +3,7 @@ import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
+import AddServicePage from "./pages/AddServicesPage";
 
 function App() {
   return (
@@ -31,6 +32,15 @@ function App() {
           element={
             <MainLayout>
               <VendorProfilePage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/vendor/add-service"
+          element={
+            <MainLayout>
+              <AddServicePage />
             </MainLayout>
           }
         />

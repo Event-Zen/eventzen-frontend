@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Pencil } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type Vendor = {
   name: string;
@@ -92,13 +93,8 @@ export default function VendorProfilePage() {
   };
 
   const onEditService = (id: string) => {
-    alert(`Edit service (demo): ${id}`);
+    alert(`Edit service : ${id}`);
   };
-
-  const onAddService = () => {
-    alert("Add service (demo)");
-  };
-
 
   // If no avatar, Showing Vender name initials
   const getInitials = (name: string) => {
@@ -179,17 +175,7 @@ export default function VendorProfilePage() {
             </div>
 
             <div className="pt-6">
-              {!isEditing ? (
-                <button
-                  type="button"
-                  className="rounded-md bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                  onClick={() =>
-                    alert("Saved (demo). Click edit icon to modify.")
-                  }
-                >
-                  Save Change
-                </button>
-              ) : (
+              {isEditing && (
                 <div className="flex gap-3">
                   <button
                     type="button"
@@ -198,6 +184,7 @@ export default function VendorProfilePage() {
                   >
                     Save Changes
                   </button>
+
                   <button
                     type="button"
                     className="rounded-md border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
@@ -238,13 +225,12 @@ export default function VendorProfilePage() {
                 </div>
               ))}
 
-              <button
-                type="button"
-                onClick={onAddService}
+              <Link
+                to="/vendor/add-service"
                 className="inline-flex rounded-md bg-red-700 px-4 py-2 text-xs font-semibold text-white hover:bg-red-800"
               >
                 Add Sevice
-              </button>
+              </Link>
             </div>
           </div>
         </div>

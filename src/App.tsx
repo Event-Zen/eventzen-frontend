@@ -5,6 +5,7 @@ import CreateEventPage from "./pages/CreateEventPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
 import AddServicePage from "./pages/AddServicesPage";
 import ServicePage from "./pages/ServicePage";
+import RoleSelectionPage from "./pages/RoleSelectionPage";
 
 function App() {
   return (
@@ -51,6 +52,15 @@ function App() {
           element={
             <MainLayout>
               <ServicePage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/signup"
+          element={
+            <MainLayout>
+              <RoleSelectionPage />
             </MainLayout>
           }
         />

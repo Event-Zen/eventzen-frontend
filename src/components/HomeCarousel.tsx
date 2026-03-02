@@ -1,10 +1,11 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation, EffectFade } from "swiper/modules";
+import { Link } from "react-router-dom";
 
-   import "swiper/css";
-   import "swiper/css/pagination";
-   import "swiper/css/navigation";
-   import "swiper/css/effect-fade";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import "swiper/css/effect-fade";
 
 type Slide = {
   id: number;
@@ -77,9 +78,12 @@ const HomeCarousel = () => {
                     <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition">
                       Find Events
                     </button>
-                    <button className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-full font-semibold transition">
+                    <Link
+                      to="/create-event"
+                      className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-full font-semibold transition inline-block"
+                    >
                       Create Event
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>

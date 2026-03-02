@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
+import ServicePage from "./pages/ServicePage";
 
 function App() {
   return (
@@ -14,6 +15,16 @@ function App() {
             </MainLayout>
           }
         />
+
+ <Route
+          path="/services"
+          element={
+            <MainLayout>
+              <ServicePage />
+            </MainLayout>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );

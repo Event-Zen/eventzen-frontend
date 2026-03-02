@@ -32,7 +32,7 @@ const Header = () => {
             Find Events
           </Link>
 
-          <Link to="/create" className="hover:text-blue-500 transition">
+          <Link to="/create-event" className="hover:text-blue-500 transition">
             Create Events
           </Link>
 

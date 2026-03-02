@@ -8,9 +8,9 @@ const Header = () => {
 
         {/* Logo */}
         <div className="flex items-center space-x-2">
-          <h1 className="text-2xl font-extrabold tracking-wide">
+          <Link to="/" className="text-2xl font-extrabold tracking-wide">
             EVENT<span className="text-blue-500">ZEN</span>
-          </h1>
+          </Link>
         </div>
 
         {/* Search Bar */}

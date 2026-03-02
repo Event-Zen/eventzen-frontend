@@ -3,6 +3,15 @@ import { useNavigate } from "react-router-dom";
 
 type EventType = "physical" | "virtual";
 
+const UNIVERSITY_LOCATIONS = [
+    "Dharmaloka Hall",
+    "A7 406",
+    "Science Auditorium",
+    "Management Auditorium",
+    "Sybe Wala",
+    "New Building Auditorium",
+];
+
 type FormState = {
     title: string;
     description: string;
@@ -219,11 +228,18 @@ export default function CreateEventPage() {
                             {/* Location */}
                             <div>
                                 <label className="block text-xs text-slate-700">Location</label>
-                                <input
+                                <select
                                     value={form.location}
                                     onChange={(e) => setField("location", e.target.value)}
-                                    className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-400"
-                                />
+                                    className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+                                >
+                                    <option value="">Select Location</option>
+                                    {UNIVERSITY_LOCATIONS.map((location) => (
+                                        <option key={location} value={location}>
+                                            {location}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             {/* Date */}

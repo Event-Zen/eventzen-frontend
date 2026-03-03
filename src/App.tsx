@@ -6,6 +6,7 @@ import VendorProfilePage from "./pages/VendorProfilePage";
 import AddServicePage from "./pages/AddServicesPage";
 import ServicePage from "./pages/ServicePage";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
+import HelpCenterPage from "./pages/HelpCenterPage";
 
 function App() {
   return (
@@ -61,6 +62,15 @@ function App() {
           element={
             <MainLayout>
               <RoleSelectionPage />
+            </MainLayout>
+          }
+        />
+
+         <Route
+          path="/help"
+          element={
+            <MainLayout>
+              <HelpCenterPage />
             </MainLayout>
           }
         />

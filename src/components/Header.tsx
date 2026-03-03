@@ -5,7 +5,7 @@ const Header = () => {
   return (
     <header className="w-full bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-       
+
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <Link
@@ -43,10 +43,13 @@ const Header = () => {
             Create Events
           </Link>
 
-          <div className="flex items-center space-x-1 cursor-pointer hover:text-blue-500 transition">
+          <Link
+            to="/help"
+            className="flex items-center space-x-1 hover:text-blue-500 transition"
+          >
             <span>Help Center</span>
             <ChevronDown size={16} />
-          </div>
+          </Link>
 
           <Link to="/profile" className="hover:text-blue-500 transition">
             Profile

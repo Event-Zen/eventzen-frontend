@@ -60,7 +60,7 @@ const Header = () => {
           </Link>
 
           <Link
-            to="/signup"
+            to="/sign-up"
             className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition"
           >
             Sign Up

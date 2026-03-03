@@ -7,6 +7,7 @@ import AddServicePage from "./pages/AddServicesPage";
 import ServicePage from "./pages/ServicePage";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
+import SignUp from "./pages/SignUp";
 
 function App() {
   return (
@@ -17,6 +18,14 @@ function App() {
           element={
             <MainLayout>
               <HomePage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/sign-up"
+          element={
+            <MainLayout>
+              <SignUp />
             </MainLayout>
           }
         />

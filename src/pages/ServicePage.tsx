@@ -231,7 +231,7 @@ const ServicesPage: React.FC = () => {
                 {cat.title}
               </h2>
 
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 justify-items-start">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4 justify-items-start">
                 {cat.items.map((item) => {
                   const isSelected = selectedByCategory[cat.id] === item.id;
 

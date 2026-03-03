@@ -85,7 +85,40 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-0px)] bg-white">
+    <div className="relative min-h-screen bg-white overflow-hidden">
+{/* Decorative Corner Squares */}
+            {/* Top Left */}
+            <div className="absolute top-10 left-10 hidden md:block">
+                <div className="relative h-20 w-20">
+                    <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
+                    <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
+                </div>
+            </div>
+
+            {/* Top Right */}
+            <div className="absolute top-10 right-10 hidden md:block">
+                <div className="relative h-20 w-20">
+                    <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
+                    <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
+                </div>
+            </div>
+
+            {/* Bottom Left */}
+            <div className="absolute bottom-10 left-10 hidden md:block">
+                <div className="relative h-20 w-20">
+                    <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
+                    <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
+                </div>
+            </div>
+
+            {/* Bottom Right */}
+            <div className="absolute bottom-10 right-10 hidden md:block">
+                <div className="relative h-20 w-20">
+                    <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
+                    <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
+                </div>
+            </div>
+
       <div className="mx-auto max-w-6xl px-6 py-10">
         {/* Layout: Center card */}
         <div className="flex justify-center">

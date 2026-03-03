@@ -7,7 +7,7 @@ import AddServicePage from "./pages/AddServicesPage";
 import ServicePage from "./pages/ServicePage";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
-
+import PaymentPage from "./pages/PaymentPage";
 function App() {
   return (
     <BrowserRouter>
@@ -74,6 +74,15 @@ function App() {
             </MainLayout>
           }
         />
+
+        <Route
+  path="/payment"
+  element={
+    <MainLayout>
+      <PaymentPage />
+    </MainLayout>
+  }
+/>
 
       </Routes>
     </BrowserRouter>

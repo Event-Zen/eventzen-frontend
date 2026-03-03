@@ -8,6 +8,7 @@ import ServicePage from "./pages/ServicePage";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import SignUp from "./pages/SignUp";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -26,6 +27,14 @@ function App() {
           element={
             <MainLayout>
               <SignUp />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <MainLayout>
+              <Login />
             </MainLayout>
           }
         />

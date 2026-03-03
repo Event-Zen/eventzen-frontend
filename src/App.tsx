@@ -66,7 +66,7 @@ function App() {
           }
         />
 
-         <Route
+        <Route
           path="/help"
           element={
             <MainLayout>
@@ -74,7 +74,6 @@ function App() {
             </MainLayout>
           }
         />
-
       </Routes>
     </BrowserRouter>
   );

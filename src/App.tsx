@@ -7,6 +7,7 @@ import AddServicePage from "./pages/AddServicesPage";
 import ServicePage from "./pages/ServicePage";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
+import PlannerProfilePage from "./pages/PlannerProfilePage";
 
 function App() {
   return (
@@ -66,11 +67,20 @@ function App() {
           }
         />
 
-         <Route
+        <Route
           path="/help"
           element={
             <MainLayout>
               <HelpCenterPage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/planner-profile"
+          element={
+            <MainLayout>
+              <PlannerProfilePage />
             </MainLayout>
           }
         />

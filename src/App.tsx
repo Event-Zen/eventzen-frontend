@@ -6,7 +6,7 @@ import VendorProfilePage from "./pages/VendorProfilePage";
 import AddServicePage from "./pages/AddServicesPage";
 import ServicePage from "./pages/ServicePage";
 import HelpCenterPage from "./pages/HelpCenterPage";
-import SignUp from "./features/ui/SignUp";
+import SignUp from "./features/auth/ui/SignUp";
 import Login from "./features/auth/ui/Login";
 import PlannerProfilePage from "./pages/PlannerProfilePage";
 import PaymentPage from "./pages/PaymentPage";

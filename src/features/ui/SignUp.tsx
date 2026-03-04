@@ -13,6 +13,7 @@ export default function Signup() {
   const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { register, loading, error } = useRegister();
   const navigate = useNavigate();
@@ -20,13 +21,23 @@ export default function Signup() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    const newErrors: Record<string, string> = {};
+
+    if (!name) newErrors.name = "Name is required";
+    if (!email) newErrors.email = "Email is required";
+    if (!password) newErrors.password = "Password is required";
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
     try {
-      const data = await register({
+      const res = await register({
         role,
         name,
         email,
@@ -34,15 +45,12 @@ export default function Signup() {
         phone,
         address,
       });
-
-      console.log("REGISTER SUCCESS:", data);
-
-      alert("Registration successful");
-
+      console.log("REGISTER RESPONSE:", res);
       navigate("/login");
     } catch (err: any) {
-      console.error(err);
-      alert(err?.response?.data?.message || "Registration failed");
+      const message = err?.response?.data?.message || "Registration failed";
+
+      setErrors({ email: message });
     }
   }
 
@@ -71,11 +79,14 @@ export default function Signup() {
             <input
               className="input"
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              autoComplete="name"
-              required
+              onChange={(e) => {
+                setName(e.target.value);
+                setErrors((prev) => ({ ...prev, name: "" }));
+              }}
             />
+            {errors.name && (
+              <p className="text-sm text-red-500 mt-1">{errors.name}</p>
+            )}
           </Field>
 
           <Field label="Email">
@@ -83,11 +94,14 @@ export default function Signup() {
               className="input"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              autoComplete="email"
-              required
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setErrors((prev) => ({ ...prev, email: "" }));
+              }}
             />
+            {errors.email && (
+              <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+            )}
           </Field>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -117,10 +131,14 @@ export default function Signup() {
               className="input"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-              required
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setErrors((prev) => ({ ...prev, password: "" }));
+              }}
             />
+            {errors.password && (
+              <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+            )}
           </Field>
 
           <Field label="Confirm password">
@@ -128,10 +146,16 @@ export default function Signup() {
               className="input"
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              autoComplete="new-password"
-              required
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+              }}
             />
+            {errors.confirmPassword && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.confirmPassword}
+              </p>
+            )}
           </Field>
 
           <button

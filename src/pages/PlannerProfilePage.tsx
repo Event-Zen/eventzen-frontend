@@ -114,8 +114,8 @@ export default function PlannerProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b5a66] px-4 py-12">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-2">
+    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-100 px-4 py-10">
+      <div className="grid w-full max-w-6xl gap-12 lg:grid-cols-2">
         {/* LEFT CARD - Planner Details */}
         <div className="rounded-2xl bg-white p-8 shadow-sm">
           {/* Header row */}

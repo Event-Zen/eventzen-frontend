@@ -231,7 +231,7 @@ const ServicesPage: React.FC = () => {
                 {cat.title}
               </h2>
 
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4 justify-items-start">
                 {cat.items.map((item) => {
                   const isSelected = selectedByCategory[cat.id] === item.id;
 
@@ -241,7 +241,7 @@ const ServicesPage: React.FC = () => {
                       type="button"
                       onClick={() => toggleSelect(cat.id, item.id)}
                       className={[
-                        "w-full rounded-xl border p-3 text-left transition",
+                        "w-[160px] rounded-xl border p-3 text-left transition",
                         "hover:-translate-y-[1px] hover:shadow-sm",
                         isSelected
                           ? "border-emerald-400 bg-emerald-100"
@@ -287,7 +287,7 @@ const ServicesPage: React.FC = () => {
         </div>
 
         {/* RIGHT (Budget report) */}
-        <aside className="lg:sticky lg:top-4">
+       <aside className="hidden lg:block lg:sticky lg:top-24 h-fit">
           <div className="rounded-2xl border border-black/10 bg-rose-300 p-4 text-rose-950">
             <div className="mb-3 text-sm font-extrabold">Budget Report</div>
 
@@ -374,7 +374,7 @@ const ServicesPage: React.FC = () => {
             onClick={() => alert("AI Support (hook up later)")}
             className="rounded-full bg-violet-600 px-4 py-2 text-sm font-bold text-white shadow hover:bg-violet-700"
           >
-            🤖 AI Support
+             ✦ AI Support
           </button>
         </div>
       </div>

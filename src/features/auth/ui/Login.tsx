@@ -29,9 +29,9 @@ export default function Login() {
 
       console.log("LOGIN RESPONSE:", data);
 
-      // store token (simple)
       localStorage.setItem("accessToken", data.accessToken);
-
+      localStorage.setItem("user", JSON.stringify(data.user));
+      
       // later: redirect by role (data.user.role)
       navigate("/");
     } catch (err: any) {

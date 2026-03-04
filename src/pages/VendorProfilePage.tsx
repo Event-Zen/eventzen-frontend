@@ -110,7 +110,7 @@ export default function VendorProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4">
+    <div className="min-h-[calc(100vh-140px)] bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-6xl">
         <div className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-2">
           <div className="rounded-2xl bg-white p-8 shadow-lg border border-gray-100">

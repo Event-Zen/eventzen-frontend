@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRegister } from "../hooks/useRegister";
+import { useRegister } from "../hooks/useRegister"; 
 import { useNavigate } from "react-router-dom";
 
 type Role = "ATTENDEE" | "VENDOR" | "PLANNER";

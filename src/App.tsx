@@ -75,14 +75,14 @@ function App() {
           }
         />
 
-        <Route
+        {/* <Route
           path="/signup"
           element={
             <MainLayout>
               <RoleSelectionPage />
             </MainLayout>
           }
-        />
+        /> */}
 
         <Route
           path="/help"

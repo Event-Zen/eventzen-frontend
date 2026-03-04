@@ -1,35 +1,75 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLogin } from "../hooks/useLogin";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  function onSubmit(e: React.FormEvent) {
+  // field + form errors
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const { login, loading } = useLogin();
+  const navigate = useNavigate();
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // later: call login API
-    console.log({ email, password });
+    const newErrors: Record<string, string> = {};
+    if (!email) newErrors.email = "Email is required";
+    if (!password) newErrors.password = "Password is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      const data = await login({ email, password });
+
+      console.log("LOGIN RESPONSE:", data);
+
+      // store token (simple)
+      localStorage.setItem("accessToken", data.accessToken);
+
+      // later: redirect by role (data.user.role)
+      navigate("/");
+    } catch (err: any) {
+      const message = err?.response?.data?.message || "Invalid credentials";
+
+      // Show general message at top (better than attaching to email always)
+      setErrors((prev) => ({ ...prev, form: message }));
+    }
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md rounded-xl bg-white shadow border border-gray-200 p-6 sm:p-8">
         <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-        <p className="text-sm text-gray-600 mt-1">
-          Login to your account
-        </p>
+        <p className="text-sm text-gray-600 mt-1">Login to your account</p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          {errors.form && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {errors.form}
+            </div>
+          )}
+
           <Field label="Email">
             <input
               className="input"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setErrors((prev) => ({ ...prev, email: "", form: "" }));
+              }}
               placeholder="you@example.com"
               autoComplete="email"
-              required
             />
+            {errors.email && (
+              <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+            )}
           </Field>
 
           <Field label="Password">
@@ -37,33 +77,29 @@ export default function Login() {
               className="input"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setErrors((prev) => ({ ...prev, password: "", form: "" }));
+              }}
+              placeholder="••••••••"
               autoComplete="current-password"
-              required
             />
+            {errors.password && (
+              <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+            )}
           </Field>
-
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 text-gray-600">
-              <input type="checkbox" className="rounded border-gray-300" />
-              Remember me
-            </label>
-
-            <a href="#" className="text-blue-600 hover:underline">
-              Forgot password?
-            </a>
-          </div>
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-600 text-white py-2.5 font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+            className="w-full rounded-lg bg-blue-600 text-white py-2.5 font-semibold hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           <p className="text-sm text-gray-600 text-center">
             Don’t have an account?{" "}
-            <a href="/sign-up" className="text-blue-600 hover:underline">
+            <a href="/signup" className="text-blue-600 hover:underline">
               Sign up
             </a>
           </p>

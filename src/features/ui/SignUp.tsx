@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useRegister } from "../hooks/useRegister";
+import { useNavigate } from "react-router-dom";
 
 type Role = "ATTENDEE" | "VENDOR" | "PLANNER";
 
@@ -12,19 +14,36 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  function onSubmit(e: React.FormEvent) {
+  const { register, loading, error } = useRegister();
+  const navigate = useNavigate();
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // later: call API register()
-    console.log({
-      role,
-      name,
-      email,
-      phone,
-      address,
-      password,
-      confirmPassword,
-    });
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const data = await register({
+        role,
+        name,
+        email,
+        password,
+        phone,
+        address,
+      });
+
+      console.log("REGISTER SUCCESS:", data);
+
+      alert("Registration successful");
+
+      navigate("/login");
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.response?.data?.message || "Registration failed");
+    }
   }
 
   return (

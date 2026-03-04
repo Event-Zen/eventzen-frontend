@@ -7,7 +7,7 @@ import AddServicePage from "./pages/AddServicesPage";
 import ServicePage from "./pages/ServicePage";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
-import SignUp from "./pages/SignUp";
+import SignUp from "./features/ui/SignUp";
 import Login from "./pages/Login";
 
 function App() {

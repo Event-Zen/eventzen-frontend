@@ -9,6 +9,7 @@ import RoleSelectionPage from "./pages/RoleSelectionPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import PlannerProfilePage from "./pages/PlannerProfilePage";
 import PaymentPage from "./pages/PaymentPage";
+import AttendeeProfilePage from "./pages/AttendeeProfilePage";
 
 
 
@@ -96,6 +97,15 @@ function App() {
             </MainLayout>
           }
         />
+
+        <Route
+  path="/attendee-profile"
+  element={
+    <MainLayout>
+      <AttendeeProfilePage />
+    </MainLayout>
+  }
+/>
 
       </Routes>
     </BrowserRouter>

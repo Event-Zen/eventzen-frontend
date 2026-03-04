@@ -52,7 +52,7 @@ function initialsFromName(name: string) {
 
 export default function AttendeeProfilePage() {
   const [form, setForm] = useState<ProfileForm>(initialProfile);
-  const [events, setEvents] = useState<EventItem[]>(initialEvents);
+  const [events] = useState<EventItem[]>(initialEvents);
 
   const avatarFallback = useMemo(() => initialsFromName(form.name), [form.name]);
 
@@ -79,7 +79,7 @@ export default function AttendeeProfilePage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#0D5D6A] flex items-center justify-center p-6">
+    <div className="min-h-screen w-full bg-slate-100 flex items-center justify-center p-6">
       <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-10">
         {/* Left: Profile Card */}
         <div className="flex-1 bg-white rounded-xl shadow-lg p-8">

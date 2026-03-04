@@ -8,7 +8,7 @@ import ServicePage from "./pages/ServicePage";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import PlannerProfilePage from "./pages/PlannerProfilePage";
-
+import PaymentPage from "./pages/PaymentPage";
 function App() {
   return (
     <BrowserRouter>
@@ -72,6 +72,15 @@ function App() {
           element={
             <MainLayout>
               <HelpCenterPage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/payment"
+          element={
+            <MainLayout>
+              <PaymentPage />
             </MainLayout>
           }
         />

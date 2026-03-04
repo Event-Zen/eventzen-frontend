@@ -5,8 +5,9 @@ import CreateEventPage from "./pages/CreateEventPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
 import AddServicePage from "./pages/AddServicesPage";
 import ServicePage from "./pages/ServicePage";
-import RoleSelectionPage from "./pages/RoleSelectionPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
+import SignUp from "./features/ui/SignUp";
+import Login from "./pages/Login";
 import PlannerProfilePage from "./pages/PlannerProfilePage";
 import PaymentPage from "./pages/PaymentPage";
 
@@ -21,6 +22,22 @@ function App() {
           element={
             <MainLayout>
               <HomePage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/sign-up"
+          element={
+            <MainLayout>
+              <SignUp />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <MainLayout>
+              <Login />
             </MainLayout>
           }
         />
@@ -61,14 +78,14 @@ function App() {
           }
         />
 
-        <Route
+        {/* <Route
           path="/signup"
           element={
             <MainLayout>
               <RoleSelectionPage />
             </MainLayout>
           }
-        />
+        /> */}
 
         <Route
           path="/help"

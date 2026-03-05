@@ -32,12 +32,12 @@ export default function Login() {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("user", JSON.stringify(data.user));
       
-      // later: redirect by role (data.user.role)
+      window.dispatchEvent(new Event("storage"));
       navigate("/");
     } catch (err: any) {
       const message = err?.response?.data?.message || "Invalid credentials";
 
-      // Show general message at top (better than attaching to email always)
+      
       setErrors((prev) => ({ ...prev, form: message }));
     }
   }

@@ -1,6 +1,7 @@
 import { Search, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthUser } from "../features/auth/hooks/useAuthUser";
+import { dashboardPath } from "../features/auth/utils/rolePaths";
 
 const Header = () => {
   const { user, isAuthed, logout } = useAuthUser();
@@ -67,20 +68,43 @@ const Header = () => {
             <ChevronDown size={16} />
           </Link>
 
-          <Link to="/profile" className="hover:text-blue-500 transition">
-            Profile
-          </Link>
+          {/* If logged in show Dashboard/Profile + Logout */}
+          {isAuthed && user ? (
+            <>
+              <Link
+                to={dashboardPath(user.role)}
+                className="hover:text-blue-500 transition"
+              >
+                Dashboard
+              </Link>
 
-          <Link to="/login" className="hover:text-blue-500 transition">
-            Log In
-          </Link>
+              <Link to="/profile" className="hover:text-blue-500 transition">
+                Profile
+              </Link>
 
-          <Link
-            to="/sign-up"
-            className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition"
-          >
-            Sign Up
-          </Link>
+              <button
+                onClick={onLogout}
+                className="hover:text-blue-500 transition"
+                type="button"
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              {/* If NOT logged in show Login / Sign up */}
+              <Link to="/login" className="hover:text-blue-500 transition">
+                Log In
+              </Link>
+
+              <Link
+                to="/sign-up"
+                className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>

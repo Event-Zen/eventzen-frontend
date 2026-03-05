@@ -22,7 +22,7 @@ const Header = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-[400px]">
+        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-400px">
           <input
             type="text"
             placeholder="Search events"

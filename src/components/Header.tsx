@@ -1,11 +1,21 @@
 import { Search, ChevronDown } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthUser } from "../features/auth/hooks/useAuthUser";
 
 const Header = () => {
+  const { user, isAuthed, logout } = useAuthUser();
+  const navigate = useNavigate();
+
+  const isAttendee = user?.role === "ATTENDEE";
+  const isPlanner = user?.role === "PLANNER";
+
+  function onLogout() {
+    logout();
+    navigate("/login");
+  }
   return (
     <header className="w-full bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <Link
@@ -35,9 +45,12 @@ const Header = () => {
 
         {/* Navigation */}
         <nav className="flex items-center space-x-6 text-sm font-medium text-gray-700">
-          <Link to="/" className="hover:text-blue-500 transition">
-            Find Events
-          </Link>
+          {/* Only attendee sees Find Events */}
+          {isAttendee && (
+            <Link to="/" className="hover:text-blue-500 transition">
+              Find Events
+            </Link>
+          )}
 
           <Link to="/create-event" className="hover:text-blue-500 transition">
             Create Events

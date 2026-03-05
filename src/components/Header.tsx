@@ -52,9 +52,12 @@ const Header = () => {
             </Link>
           )}
 
-          <Link to="/create-event" className="hover:text-blue-500 transition">
-            Create Events
-          </Link>
+          {/* Only planner sees Create Events */}
+          {isPlanner && (
+            <Link to="/create-event" className="hover:text-blue-500 transition">
+              Create Events
+            </Link>
+          )}
 
           <Link
             to="/help"

@@ -11,12 +11,14 @@ import Login from "./features/auth/ui/Login";
 import PlannerProfilePage from "./pages/PlannerProfilePage";
 import PaymentPage from "./pages/PaymentPage";
 
-
+import { RoleRoute } from "./features/auth/ui/RoleRoute";
+import { ProtectedRoute } from "./features/auth/ui/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public */}
         <Route
           path="/"
           element={
@@ -25,6 +27,7 @@ function App() {
             </MainLayout>
           }
         />
+
         <Route
           path="/sign-up"
           element={
@@ -33,38 +36,12 @@ function App() {
             </MainLayout>
           }
         />
+
         <Route
           path="/login"
           element={
             <MainLayout>
               <Login />
-            </MainLayout>
-          }
-        />
-
-        <Route
-          path="/create-event"
-          element={
-            <MainLayout>
-              <CreateEventPage />
-            </MainLayout>
-          }
-        />
-
-        <Route
-          path="/vendor-profile"
-          element={
-            <MainLayout>
-              <VendorProfilePage />
-            </MainLayout>
-          }
-        />
-
-        <Route
-          path="/vendor/add-service"
-          element={
-            <MainLayout>
-              <AddServicePage />
             </MainLayout>
           }
         />
@@ -78,15 +55,6 @@ function App() {
           }
         />
 
-        {/* <Route
-          path="/signup"
-          element={
-            <MainLayout>
-              <RoleSelectionPage />
-            </MainLayout>
-          }
-        /> */}
-
         <Route
           path="/help"
           element={
@@ -96,24 +64,63 @@ function App() {
           }
         />
 
+        {/* Planner only */}
         <Route
-          path="/payment"
+          path="/create-event"
           element={
-            <MainLayout>
-              <PaymentPage />
-            </MainLayout>
+            <RoleRoute allow={["PLANNER"]}>
+              <MainLayout>
+                <CreateEventPage />
+              </MainLayout>
+            </RoleRoute>
           }
         />
 
         <Route
           path="/planner-profile"
           element={
-            <MainLayout>
-              <PlannerProfilePage />
-            </MainLayout>
+            <RoleRoute allow={["PLANNER"]}>
+              <MainLayout>
+                <PlannerProfilePage />
+              </MainLayout>
+            </RoleRoute>
           }
         />
 
+        {/* Vendor only */}
+        <Route
+          path="/vendor-profile"
+          element={
+            <RoleRoute allow={["VENDOR"]}>
+              <MainLayout>
+                <VendorProfilePage />
+              </MainLayout>
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/vendor/add-service"
+          element={
+            <RoleRoute allow={["VENDOR"]}>
+              <MainLayout>
+                <AddServicePage />
+              </MainLayout>
+            </RoleRoute>
+          }
+        />
+
+        {/*auth-only (any logged in user) */}
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <PaymentPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

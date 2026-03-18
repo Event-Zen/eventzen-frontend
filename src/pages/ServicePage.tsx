@@ -364,7 +364,7 @@ const ServicesPage: React.FC = () => {
           
 
           <button
-            onClick={() => alert("Finish (navigate to next step later)")}
+            onClick={() => navigate("/payment")}
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
           >
             Finish

@@ -1,6 +1,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation, EffectFade } from "swiper/modules";
 import { Link } from "react-router-dom";
+import { useAuthUser } from "../features/auth/hooks/useAuthUser";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -36,6 +37,11 @@ const slides: Slide[] = [
 ];
 
 const HomeCarousel = () => {
+  const { user } = useAuthUser();
+
+  const isAttendee = user?.role === "ATTENDEE";
+  const isPlanner = user?.role === "PLANNER";
+
   return (
     <section className="w-full">
       <Swiper
@@ -75,15 +81,19 @@ const HomeCarousel = () => {
 
                   {/* Optional CTA Buttons */}
                   <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition">
-                      Find Events
-                    </button>
-                    <Link
-                      to="/create-event"
-                      className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-full font-semibold transition inline-block"
-                    >
-                      Create Event
-                    </Link>
+                    {isAttendee && (
+                      <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition">
+                        Find Events
+                      </button>
+                    )}
+                    {isPlanner && (
+                      <Link
+                        to="/create-event"
+                        className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-full font-semibold transition inline-block"
+                      >
+                        Create Event
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

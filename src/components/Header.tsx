@@ -1,7 +1,7 @@
 import { Search, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthUser } from "../features/auth/hooks/useAuthUser";
-import { dashboardPath } from "../features/auth/utils/rolePaths";
+import { dashboardPath, profilePath } from "../features/auth/utils/rolePaths";
 
 const Header = () => {
   const { user, isAuthed, logout } = useAuthUser();
@@ -78,7 +78,7 @@ const Header = () => {
                 Dashboard
               </Link>
 
-              <Link to="/profile" className="hover:text-blue-500 transition">
+              <Link to={profilePath(user.role)} className="hover:text-blue-500 transition">
                 Profile
               </Link>
 

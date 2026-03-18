@@ -6,3 +6,9 @@ export function dashboardPath(role: Role) {
   if (role === "VENDOR") return "/vendor/dashboard";
   return "/admin/dashboard";
 }
+
+export function profilePath(role: Role) {
+  if (role === "PLANNER") return "/planner-profile";
+  if (role === "VENDOR") return "/vendor-profile";
+  return "/profile";
+}

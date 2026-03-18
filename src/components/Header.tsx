@@ -21,8 +21,9 @@ const Header = () => {
         <div className="flex items-center space-x-2">
           <Link
             to="/"
-            className="group transition-all duration-300 transform hover:-translate-y-0.5"
+            className="group transition-all duration-300 transform hover:-translate-y-0.5 flex items-center space-x-2"
           >
+            <img src="/eventzen-logo.png" alt="EventZen Logo" className="h-14 w-14 object-contain" />
             <h1 className="text-2xl font-extrabold tracking-wide group-hover:text-gray-700">
               EVENT
               <span className="text-blue-500 transition-colors group-hover:text-blue-600">

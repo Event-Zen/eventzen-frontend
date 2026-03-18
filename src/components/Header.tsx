@@ -16,7 +16,7 @@ const Header = () => {
   }
   return (
     <header className="w-full bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-y-4">
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <Link
@@ -34,7 +34,7 @@ const Header = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-400px">
+        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-full sm:max-w-[400px]">
           <input
             type="text"
             placeholder="Search events"
@@ -46,7 +46,7 @@ const Header = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex items-center space-x-6 text-sm font-medium text-gray-700">
+        <nav className="flex flex-wrap items-center gap-4 lg:gap-6 text-sm font-medium text-gray-700">
           {/* Only attendee sees Find Events */}
           {isAttendee && (
             <Link to="/" className="hover:text-blue-500 transition">

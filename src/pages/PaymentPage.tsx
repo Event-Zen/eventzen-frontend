@@ -68,56 +68,72 @@ export default function PaymentPage() {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const onPay = (e: React.FormEvent) => {
+  const onPay = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    // Demo: replace with real payment flow
-    console.log("Payment payload:", {
-      ...form,
-      cardNumber: cardDigits,
-      expiry: form.expiry.replace(/\s/g, ""),
-      cvc: form.cvc.replace(/\D/g, ""),
-    });
+    try {
+      // Connect to our new Payment Service backend!
+      const response = await fetch("http://localhost:3003/api/payments/create-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventId: "evt_123", // Mock data for test
+          userId: "usr_456",
+          amount: 50, // Test amount
+          currency: "usd",
+        }),
+      });
 
-    alert("Payment successful (demo).");
-    navigate("/"); // or navigate to confirmation page
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create payment intent");
+      }
+
+      console.log("Stripe Client Secret received:", data.clientSecret);
+      alert(`Success! Successfully reached backend. \nPayment ID: ${data.paymentId}`);
+      navigate("/");
+    } catch (error: any) {
+      console.error(error);
+      alert("Error: " + error.message);
+    }
   };
 
   return (
     <div className="relative min-h-screen bg-white overflow-hidden">
-{/* Decorative Corner Squares */}
-            {/* Top Left */}
-            <div className="absolute top-10 left-10 hidden md:block">
-                <div className="relative h-20 w-20">
-                    <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
-                    <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
-                </div>
-            </div>
+      {/* Decorative Corner Squares */}
+      {/* Top Left */}
+      <div className="absolute top-10 left-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
+        </div>
+      </div>
 
-            {/* Top Right */}
-            <div className="absolute top-10 right-10 hidden md:block">
-                <div className="relative h-20 w-20">
-                    <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
-                    <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
-                </div>
-            </div>
+      {/* Top Right */}
+      <div className="absolute top-10 right-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
+        </div>
+      </div>
 
-            {/* Bottom Left */}
-            <div className="absolute bottom-10 left-10 hidden md:block">
-                <div className="relative h-20 w-20">
-                    <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
-                    <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
-                </div>
-            </div>
+      {/* Bottom Left */}
+      <div className="absolute bottom-10 left-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
+        </div>
+      </div>
 
-            {/* Bottom Right */}
-            <div className="absolute bottom-10 right-10 hidden md:block">
-                <div className="relative h-20 w-20">
-                    <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
-                    <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
-                </div>
-            </div>
+      {/* Bottom Right */}
+      <div className="absolute bottom-10 right-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
+        </div>
+      </div>
 
       <div className="mx-auto max-w-6xl px-6 py-10">
         {/* Layout: Center card */}

@@ -82,9 +82,12 @@ const HomeCarousel = () => {
                   {/* Optional CTA Buttons */}
                   <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                     {isAttendee && (
-                      <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition">
+                      <Link
+                        to="/find-events"
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition inline-block"
+                      >
                         Find Events
-                      </button>
+                      </Link>
                     )}
                     {isPlanner && (
                       <Link

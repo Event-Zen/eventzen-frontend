@@ -4,7 +4,9 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 // Load Stripe outside of components to avoid recreating the object
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "");
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "", {
+  developerTools: { assistant: { enabled: false } }
+});
 
 function CheckoutForm() {
   const stripe = useStripe();

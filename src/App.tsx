@@ -11,6 +11,7 @@ import Login from "./features/auth/ui/Login";
 import PlannerProfilePage from "./pages/PlannerProfilePage";
 import PaymentPage from "./pages/PaymentPage";
 import UpcomingEventsPage from "./pages/UpcomingEventsPage";
+import AttendeeProfilePage from "./pages/AttendeeProfilePage";
 
 import { RoleRoute } from "./features/auth/ui/RoleRoute";
 import { ProtectedRoute } from "./features/auth/ui/ProtectedRoute";
@@ -131,6 +132,15 @@ function App() {
             </MainLayout>
           }
         />
+
+        <Route
+  path="/attendee-profile"
+  element={
+    <MainLayout>
+      <AttendeeProfilePage />
+    </MainLayout>
+  }
+/>
       </Routes>
     </BrowserRouter>
   );

@@ -15,6 +15,7 @@ const upcomingEvents: EventItem[] = [
     description:
       "A glamorous evening filled with live music, exquisite dining, and dancing. Perfect for corporate gatherings or charity fundraisers.",
     ticketPrice: "Rs. 1,000.00",
+    image: "/images/events/event1.jpg",
   },
   {
     id: "2",
@@ -22,6 +23,7 @@ const upcomingEvents: EventItem[] = [
     description:
       "A celebration of diverse cultures with traditional music, dance, food, and crafts from around the world.",
     ticketPrice: "Rs. 1,000.00",
+    image: "/images/events/event2.jpg",
   },
   {
     id: "3",
@@ -29,6 +31,7 @@ const upcomingEvents: EventItem[] = [
     description:
       "A live music festival featuring performances from various genres and artists. Ideal for music lovers looking to enjoy a day of great tunes and good vibes.",
     ticketPrice: "Rs. 1,000.00",
+    image: "/images/events/event3.jpg",
   },
   {
     id: "4",
@@ -36,6 +39,7 @@ const upcomingEvents: EventItem[] = [
     description:
       "A culinary festival with food trucks, gourmet chefs, tastings, and fun food-related workshops.",
     ticketPrice: "Rs. 1,500.00",
+    image: "/images/events/event4.jpg",
   },
   {
     id: "5",
@@ -43,6 +47,8 @@ const upcomingEvents: EventItem[] = [
     description:
       "An engaging meetup for developers, designers, and tech enthusiasts to network and share ideas.",
     ticketPrice: "Rs. 750.00",
+    image: "/images/events/event5.jpg",
+
   },
   {
     id: "6",
@@ -50,6 +56,7 @@ const upcomingEvents: EventItem[] = [
     description:
       "Explore creative works, handmade items, live demonstrations, and inspiring local artists.",
     ticketPrice: "Rs. 500.00",
+    image: "/images/events/event6.jpg",
   },
 ];
 
@@ -74,7 +81,11 @@ export default function UpcomingEventsPage() {
               key={event.id}
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
             >
-              <div className="mb-3 h-40 rounded-xl bg-slate-200" />
+              <img
+                src={event.image}
+                alt={event.title}
+                className="mb-3 h-40 w-full rounded-xl object-cover"
+              />
 
               <h2 className="text-lg font-semibold text-slate-900">
                 {event.title}

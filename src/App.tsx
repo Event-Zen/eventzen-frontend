@@ -134,13 +134,13 @@ function App() {
         />
 
         <Route
-  path="/attendee-profile"
-  element={
-    <MainLayout>
-      <AttendeeProfilePage />
-    </MainLayout>
-  }
-/>
+          path="/attendee-profile"
+          element={
+            <MainLayout>
+              <AttendeeProfilePage />
+            </MainLayout>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

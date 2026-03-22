@@ -10,5 +10,6 @@ export function dashboardPath(role: Role) {
 export function profilePath(role: Role) {
   if (role === "PLANNER") return "/planner-profile";
   if (role === "VENDOR") return "/vendor-profile";
+  if (role === "ATTENDEE") return "/attendee-profile";
   return "/profile";
 }

@@ -21,7 +21,7 @@ const upcomingEvents: EventItem[] = [
     id: "2",
     title: "Cultural Carnival",
     description:
-      "A celebration of diverse cultures with traditional music, dance, food, and crafts from around the world.",
+      "A celebration of diverse cultures with traditional music, dance, food, and crafts from around the world. Enjoy the best of global cultures in one vibrant event.",
     ticketPrice: "Rs. 1,000.00",
     image: "/images/events/event2.jpg",
   },

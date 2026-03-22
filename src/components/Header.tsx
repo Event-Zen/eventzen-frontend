@@ -49,7 +49,7 @@ const Header = () => {
         <nav className="flex flex-wrap items-center gap-4 lg:gap-6 text-sm font-medium text-gray-700">
           {/* Only attendee sees Find Events */}
           {isAttendee && (
-            <Link to="/" className="hover:text-blue-500 transition">
+            <Link to="/find-events" className="hover:text-blue-500 transition">
               Find Events
             </Link>
           )}
@@ -72,12 +72,12 @@ const Header = () => {
           {/* If logged in show Dashboard/Profile + Logout */}
           {isAuthed && user ? (
             <>
-              <Link
+              {/* <Link
                 to={dashboardPath(user.role)}
                 className="hover:text-blue-500 transition"
               >
                 Dashboard
-              </Link>
+              </Link> */}
 
               <Link to={profilePath(user.role)} className="hover:text-blue-500 transition">
                 Profile

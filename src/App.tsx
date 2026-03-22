@@ -10,6 +10,7 @@ import SignUp from "./features/auth/ui/SignUp";
 import Login from "./features/auth/ui/Login";
 import PlannerProfilePage from "./pages/PlannerProfilePage";
 import PaymentPage from "./pages/PaymentPage";
+import UpcomingEventsPage from "./pages/UpcomingEventsPage";
 
 import { RoleRoute } from "./features/auth/ui/RoleRoute";
 import { ProtectedRoute } from "./features/auth/ui/ProtectedRoute";
@@ -119,6 +120,15 @@ function App() {
                 <PaymentPage />
               </MainLayout>
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/find-events"
+          element={
+            <MainLayout>
+              <UpcomingEventsPage />
+            </MainLayout>
           }
         />
       </Routes>

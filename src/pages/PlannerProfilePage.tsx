@@ -111,7 +111,24 @@ export default function PlannerProfilePage() {
 
     const onCreate = () => {
         navigate("/create-event");
+
     };
+
+    const openGoogleCalendar = (ev: PlannerEvent) => {
+    const formatDate = (date: Date) =>
+        date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    const start = new Date();
+    const end = new Date(Date.now() + 60 * 60 * 1000);
+
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE
+&text=${encodeURIComponent(ev.title)}
+&dates=${formatDate(start)}/${formatDate(end)}
+&details=${encodeURIComponent(ev.description)}
+&location=Online`;
+
+    window.open(url, "_blank");
+};
 
     return (
         <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-100 px-4 py-10">

@@ -263,13 +263,15 @@ const url = `https://calendar.google.com/calendar/render?action=TEMPLATE
                             </div>
                         ))}
 
-                         <button
-                                        onClick={() => openGoogleCalendar(ev)}
-                                        className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-md text-xs"
-                                    >
-                                        <FaCalendarAlt />
-                                        Calendar
-                                    </button>
+                        <button
+    onClick={() => openGoogleCalendar(ev)}
+    className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-md text-xs"
+>
+    <FaCalendarAlt />
+    Calendar
+</button>
+
+                        
                                      <button
                                         onClick={openGoogleMeet}
                                         className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-md text-xs"

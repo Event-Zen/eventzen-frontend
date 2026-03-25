@@ -253,6 +253,13 @@ export default function PlannerProfilePage() {
                                         <FaCalendarAlt />
                                         Calendar
                                     </button>
+                                     <button
+                                        onClick={openGoogleMeet}
+                                        className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-md text-xs"
+                                    >
+                                        <FaVideo />
+                                        Meet
+                                    </button>
                     </div>
                 </div>
             </div>

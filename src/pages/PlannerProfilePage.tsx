@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { FaCalendarAlt, FaVideo } from "react-icons/fa";
 
 type Planner = {
     name: string;
@@ -14,7 +15,7 @@ type PlannerEvent = {
     id: string;
     title: string;
     description: string;
-    progressLabel: string; // "Completed" | "Up Coming"
+    progressLabel: string;
     progressColor: "green" | "blue";
 };
 
@@ -54,14 +55,13 @@ function FieldRow({
 export default function PlannerProfilePage() {
     const navigate = useNavigate();
 
-    // demo data
     const initialPlanner: Planner = useMemo(
         () => ({
             name: "Kasun Madushan",
             email: "kasun@gmail.com",
             mobile: "(+94) 77 1212654",
             location: "Weligama, Matara",
-            avatarUrl: "", // optional
+            avatarUrl: "",
         }),
         []
     );
@@ -75,7 +75,7 @@ export default function PlannerProfilePage() {
             id: "e1",
             title: "Gala Night Extravaganza",
             description:
-                "A glamorous evening filled with live music, exquisite dining, and dancing. Perfect for corporate gatherings or charity fundraisers",
+                "A glamorous evening filled with live music, exquisite dining, and dancing.",
             progressLabel: "Completed",
             progressColor: "green",
         },
@@ -83,7 +83,7 @@ export default function PlannerProfilePage() {
             id: "e2",
             title: "Foodie Fest",
             description:
-                "A culinary festival showcasing a variety of food trucks, local restaurants, and gourmet chefs. Attendees can enjoy tastings, cooking demos, and food-related workshops.",
+                "A culinary festival showcasing a variety of food trucks and chefs.",
             progressLabel: "Up Coming",
             progressColor: "blue",
         },
@@ -100,7 +100,6 @@ export default function PlannerProfilePage() {
     };
 
     const saveEdit = () => {
-        // TODO: API call here
         setPlanner(draft);
         setIsEditing(false);
     };
@@ -111,61 +110,62 @@ export default function PlannerProfilePage() {
 
     const onCreate = () => {
         navigate("/create-event");
-
     };
 
+    // ✅ GOOGLE CALENDAR
     const openGoogleCalendar = (ev: PlannerEvent) => {
-    const formatDate = (date: Date) =>
-        date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+        const formatDate = (date: Date) =>
+            date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
-    const start = new Date();
-const end = new Date(Date.now() + 60 * 60 * 1000);
+        const start = new Date();
+        const end = new Date(Date.now() + 60 * 60 * 1000);
 
-const url = `https://calendar.google.com/calendar/render?action=TEMPLATE
-&text=${encodeURIComponent(ev.title)}
-&dates=${formatDateForCalendar(start)}/${formatDateForCalendar(end)}
-&details=${encodeURIComponent(ev.description)}
-&location=Online`;
+        const url = `https://calendar.google.com/calendar/render?action=TEMPLATE
+        &text=${encodeURIComponent(ev.title)}
+        &dates=${formatDate(start)}/${formatDate(end)}
+        &details=${encodeURIComponent(ev.description)}
+        &location=Online`;
 
-    window.open(url, "_blank");
-};
+        window.open(url, "_blank");
+    };
 
-const openGoogleMeet = () => {
-    window.open("https://meet.google.com", "_blank");
-};
+    // ✅ GOOGLE MEET
+    const openGoogleMeet = () => {
+        window.open("https://meet.google.com", "_blank");
+    };
 
     return (
         <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-100 px-4 py-10">
             <div className="grid w-full max-w-6xl gap-12 lg:grid-cols-2">
-                {/* LEFT CARD - Planner Details */}
+
+                {/* LEFT CARD */}
                 <div className="rounded-2xl bg-white p-8 shadow-sm">
-                    {/* Header row */}
                     <div className="relative flex items-center justify-center pb-6">
                         <div className="flex items-center gap-4">
                             <div className="h-14 w-14 overflow-hidden rounded-full bg-slate-200">
-                                {planner.avatarUrl ? (
+                                {planner.avatarUrl && (
                                     <img
                                         src={planner.avatarUrl}
                                         alt="Planner avatar"
                                         className="h-full w-full object-cover"
                                     />
-                                ) : null}
+                                )}
                             </div>
 
                             <div className="text-left">
                                 <div className="text-sm font-semibold text-slate-900">
                                     {planner.name}
                                 </div>
-                                <div className="text-xs text-slate-500">{planner.email}</div>
+                                <div className="text-xs text-slate-500">
+                                    {planner.email}
+                                </div>
                             </div>
                         </div>
 
-                        {/* edit icon */}
                         <button
                             type="button"
                             onClick={startEdit}
                             className="absolute right-0 top-0 rounded-full p-2 text-slate-600 hover:bg-slate-100"
-                            title="Edit planner details"
                         >
                             <Pencil className="h-4 w-4" />
                         </button>
@@ -199,29 +199,25 @@ const openGoogleMeet = () => {
                         />
                     </div>
 
-                    {/* Save button like screenshot */}
                     <div className="pt-6">
                         {!isEditing ? (
                             <button
                                 type="button"
                                 className="rounded-md bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-700"
-                                onClick={() => alert("Saved (demo). Use edit icon to modify.")}
                             >
                                 Save Change
                             </button>
                         ) : (
                             <div className="flex gap-3">
                                 <button
-                                    type="button"
-                                    className="rounded-md bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-700"
                                     onClick={saveEdit}
+                                    className="rounded-md bg-blue-600 px-6 py-2 text-xs text-white"
                                 >
-                                    Save Change
+                                    Save
                                 </button>
                                 <button
-                                    type="button"
-                                    className="rounded-md border border-slate-300 bg-white px-6 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                                     onClick={cancelEdit}
+                                    className="border px-6 py-2 text-xs"
                                 >
                                     Cancel
                                 </button>
@@ -230,60 +226,54 @@ const openGoogleMeet = () => {
                     </div>
                 </div>
 
-                {/* RIGHT CARD - Events */}
+                {/* RIGHT CARD */}
                 <div className="rounded-2xl bg-white p-8 shadow-sm">
-                    <h2 className="text-center font-semibold text-slate-900">Your Events</h2>
+                    <h2 className="text-center font-semibold text-slate-900">
+                        Your Events
+                    </h2>
 
-                    <div className="mt-3 flex gap-2">
+                    <div className="mt-6 space-y-4">
                         {events.map((ev) => (
                             <div
                                 key={ev.id}
-                                className="relative rounded-xl bg-slate-200 px-5 py-4 text-slate-900"
+                                className="relative rounded-xl bg-slate-200 px-5 py-4"
                             >
                                 <button
-                                    type="button"
                                     onClick={() => onEditEvent(ev.id)}
-                                    className="absolute right-3 top-3 rounded-full p-1.5 text-slate-700 hover:bg-slate-300"
-                                    title="Edit event"
+                                    className="absolute right-3 top-3"
                                 >
                                     <Pencil className="h-4 w-4" />
                                 </button>
 
-                                <div className="text-sm font-semibold">{ev.title}</div>
-                                <div className="mt-2 text-xs text-slate-800">{ev.description}</div>
+                                <div className="font-semibold">{ev.title}</div>
+                                <div className="text-xs mt-2">{ev.description}</div>
 
-                                <div className="mt-3 text-xs font-semibold">
-                                    Progress :{" "}
-                                    <span
-                                        className={
-                                            ev.progressColor === "green"
-                                                ? "text-green-700"
-                                                : "text-blue-700"
-                                        }
+                                <div className="mt-3 text-xs">
+                                    Progress: {ev.progressLabel}
+                                </div>
+
+                                {/* ✅ BUTTONS */}
+                                <div className="mt-3 flex gap-2">
+                                    <button
+                                        onClick={() => openGoogleCalendar(ev)}
+                                        className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-md text-xs"
                                     >
-                                        {ev.progressLabel}
-                                    </span>
+                                        <FaCalendarAlt />
+                                        Calendar
+                                    </button>
+
+                                    <button
+                                        onClick={openGoogleMeet}
+                                        className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-md text-xs"
+                                    >
+                                        <FaVideo />
+                                        Meet
+                                    </button>
                                 </div>
                             </div>
                         ))}
 
                         <button
-    onClick={() => openGoogleCalendar(ev)}
-    className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-md text-xs"
->
-    <FaCalendarAlt />
-    Calendar
-</button>
-
-                        
-                                  <button
-    onClick={openGoogleMeet}
-    className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-md text-xs"
->
-    <FaVideo />
-    Meet
-</button>
-                                     <button
                             onClick={onCreate}
                             className="bg-red-700 text-white px-6 py-2 rounded-md text-xs"
                         >

@@ -15,6 +15,8 @@ type EventItem = {
   title: string;
   description: string;
   progress: "Completed" | "Up Coming";
+  startDate?: string;
+  endDate?: string;
 };
 
 const initialProfile: ProfileForm = {
@@ -33,6 +35,8 @@ const initialEvents: EventItem[] = [
     description:
       "A glamorous evening filled with live music, exquisite dining, and dancing. Perfect for corporate gatherings or charity fundraisers",
     progress: "Completed",
+    startDate: "2026-04-05T18:00:00",
+    endDate: "2026-04-05T22:00:00",
   },
   {
     id: "2",
@@ -40,6 +44,8 @@ const initialEvents: EventItem[] = [
     description:
       "A culinary festival showcasing a variety of food trucks, local restaurants, and gourmet chefs. Attendees can enjoy tastings, cooking demos, and food-related workshops.",
     progress: "Up Coming",
+    startDate: "2026-05-10T12:00:00",
+    endDate: "2026-05-10T18:00:00",
   },
 ];
 

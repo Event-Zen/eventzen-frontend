@@ -130,6 +130,10 @@ const url = `https://calendar.google.com/calendar/render?action=TEMPLATE
     window.open(url, "_blank");
 };
 
+const openGoogleMeet = () => {
+    window.open("https://meet.google.com", "_blank");
+};
+
     return (
         <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-100 px-4 py-10">
             <div className="grid w-full max-w-6xl gap-12 lg:grid-cols-2">

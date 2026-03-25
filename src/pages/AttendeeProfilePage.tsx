@@ -84,7 +84,7 @@ export default function AttendeeProfilePage() {
     console.log("Create event");
     alert("Go to Create Event page");
   }
-  
+
   function handleAddToGoogleCalendar(event: EventItem) {
   const start = formatDateForGoogleCal(event.startDate);
   const end = formatDateForGoogleCal(event.endDate);
@@ -226,6 +226,13 @@ export default function AttendeeProfilePage() {
               </div>
             ))}
           </div>
+<button
+  type="button"
+  onClick={() => handleAddToGoogleCalendar(ev)}
+  className="mt-3 inline-flex items-center justify-center rounded-md bg-[#0A66C2] px-4 py-1 text-white font-medium text-sm shadow-sm hover:opacity-95 active:opacity-90"
+>
+  Add to Google Calendar
+</button>
 
           <button
             type="button"

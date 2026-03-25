@@ -276,13 +276,13 @@ const openGoogleMeet = () => {
 </button>
 
                         
-                                     <button
-                                        onClick={openGoogleMeet}
-                                        className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-md text-xs"
-                                    >
-                                        <FaVideo />
-                                        Meet
-                                    </button>
+                                  <button
+    onClick={openGoogleMeet}
+    className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-md text-xs"
+>
+    <FaVideo />
+    Meet
+</button>
                                      <button
                             onClick={onCreate}
                             className="bg-red-700 text-white px-6 py-2 rounded-md text-xs"

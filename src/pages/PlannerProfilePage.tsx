@@ -119,11 +119,11 @@ export default function PlannerProfilePage() {
         date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
     const start = new Date();
-    const end = new Date(Date.now() + 60 * 60 * 1000);
+const end = new Date(Date.now() + 60 * 60 * 1000);
 
-    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE
+const url = `https://calendar.google.com/calendar/render?action=TEMPLATE
 &text=${encodeURIComponent(ev.title)}
-&dates=${formatDate(start)}/${formatDate(end)}
+&dates=${formatDateForCalendar(start)}/${formatDateForCalendar(end)}
 &details=${encodeURIComponent(ev.description)}
 &location=Online`;
 

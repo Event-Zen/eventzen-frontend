@@ -84,6 +84,15 @@ export default function AttendeeProfilePage() {
     console.log("Create event");
     alert("Go to Create Event page");
   }
+  
+  function handleAddToGoogleCalendar(event: EventItem) {
+  const start = formatDateForGoogleCal(event.startDate);
+  const end = formatDateForGoogleCal(event.endDate);
+  const details = encodeURIComponent(event.description);
+  const title = encodeURIComponent(event.title);
+  const url = `https://calendar.google.com/calendar/r/eventedit?text=${title}&dates=${start}/${end}&details=${details}`;
+  window.open(url, "_blank");
+}
 
   return (
     <div className="min-h-screen w-full bg-slate-100 flex items-center justify-center p-6">

@@ -15,6 +15,8 @@ type EventItem = {
   title: string;
   description: string;
   progress: "Completed" | "Up Coming";
+  startDate?: string; // ISO string e.g., 2026-03-25T18:00:00
+  endDate?: string;   // ISO string
 };
 
 const initialProfile: ProfileForm = {
@@ -33,6 +35,8 @@ const initialEvents: EventItem[] = [
     description:
       "A glamorous evening filled with live music, exquisite dining, and dancing. Perfect for corporate gatherings or charity fundraisers",
     progress: "Completed",
+    startDate: "2026-04-05T18:00:00",
+    endDate: "2026-04-05T22:00:00",
   },
   {
     id: "2",
@@ -40,6 +44,8 @@ const initialEvents: EventItem[] = [
     description:
       "A culinary festival showcasing a variety of food trucks, local restaurants, and gourmet chefs. Attendees can enjoy tastings, cooking demos, and food-related workshops.",
     progress: "Up Coming",
+    startDate: "2026-05-10T12:00:00",
+    endDate: "2026-05-10T18:00:00",
   },
 ];
 
@@ -68,31 +74,28 @@ export default function AttendeeProfilePage() {
   }
 
   function handleSave() {
-    // TODO: integrate API call (PATCH /profile) etc.
     console.log("Saving profile:", form);
     alert("Profile saved!");
   }
 
   function handleEditEvent(id: string) {
-    // TODO: navigate to edit event page (e.g., /events/:id/edit)
     console.log("Edit event:", id);
     alert(`Edit event: ${id}`);
   }
 
   function handleCreateEvent() {
-    // TODO: navigate to create event page (e.g., /events/create)
     console.log("Create event");
     alert("Go to Create Event page");
   }
 
   function handleAddToGoogleCalendar(event: EventItem) {
-  const start = formatDateForGoogleCal(event.startDate);
-  const end = formatDateForGoogleCal(event.endDate);
-  const details = encodeURIComponent(event.description);
-  const title = encodeURIComponent(event.title);
-  const url = `https://calendar.google.com/calendar/r/eventedit?text=${title}&dates=${start}/${end}&details=${details}`;
-  window.open(url, "_blank");
-}
+    const start = formatDateForGoogleCal(event.startDate);
+    const end = formatDateForGoogleCal(event.endDate);
+    const details = encodeURIComponent(event.description);
+    const title = encodeURIComponent(event.title);
+    const url = `https://calendar.google.com/calendar/r/eventedit?text=${title}&dates=${start}/${end}&details=${details}`;
+    window.open(url, "_blank");
+  }
 
   return (
     <div className="min-h-screen w-full bg-slate-100 flex items-center justify-center p-6">
@@ -114,7 +117,6 @@ export default function AttendeeProfilePage() {
                 </div>
               )}
 
-              {/* small edit icon circle */}
               <button
                 type="button"
                 className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm"
@@ -170,7 +172,6 @@ export default function AttendeeProfilePage() {
               />
             </div>
 
-            {/* Button */}
             <div className="pt-4">
               <button
                 type="button"
@@ -191,10 +192,7 @@ export default function AttendeeProfilePage() {
 
           <div className="space-y-4">
             {events.map((ev) => (
-              <div
-                key={ev.id}
-                className="relative rounded-lg bg-gray-200/80 p-4"
-              >
+              <div key={ev.id} className="relative rounded-lg bg-gray-200/80 p-4">
                 <button
                   type="button"
                   className="absolute top-3 right-3 text-gray-700 hover:text-gray-900"
@@ -204,12 +202,8 @@ export default function AttendeeProfilePage() {
                   <Pencil size={16} />
                 </button>
 
-                <div className="font-semibold text-gray-900 mb-2">
-                  {ev.title}
-                </div>
-                <div className="text-sm text-gray-700 leading-relaxed">
-                  {ev.description}
-                </div>
+                <div className="font-semibold text-gray-900 mb-2">{ev.title}</div>
+                <div className="text-sm text-gray-700 leading-relaxed">{ev.description}</div>
 
                 <div className="text-sm mt-3">
                   <span className="text-gray-700">Progress : </span>
@@ -223,16 +217,18 @@ export default function AttendeeProfilePage() {
                     {ev.progress}
                   </span>
                 </div>
+
+                {/* Google Calendar Button */}
+                <button
+                  type="button"
+                  onClick={() => handleAddToGoogleCalendar(ev)}
+                  className="mt-3 inline-flex items-center justify-center rounded-md bg-[#0A66C2] px-4 py-1 text-white font-medium text-sm shadow-sm hover:opacity-95 active:opacity-90"
+                >
+                  Add to Google Calendar
+                </button>
               </div>
             ))}
           </div>
-<button
-  type="button"
-  onClick={() => handleAddToGoogleCalendar(ev)}
-  className="mt-3 inline-flex items-center justify-center rounded-md bg-[#0A66C2] px-4 py-1 text-white font-medium text-sm shadow-sm hover:opacity-95 active:opacity-90"
->
-  Add to Google Calendar
-</button>
 
           <button
             type="button"

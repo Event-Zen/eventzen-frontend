@@ -260,6 +260,12 @@ export default function PlannerProfilePage() {
                                         <FaVideo />
                                         Meet
                                     </button>
+                                     <button
+                            onClick={onCreate}
+                            className="bg-red-700 text-white px-6 py-2 rounded-md text-xs"
+                        >
+                            Create
+                        </button>
                     </div>
                 </div>
             </div>

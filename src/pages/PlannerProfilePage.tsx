@@ -234,7 +234,7 @@ const openGoogleMeet = () => {
                 <div className="rounded-2xl bg-white p-8 shadow-sm">
                     <h2 className="text-center font-semibold text-slate-900">Your Events</h2>
 
-                    <div className="mt-6 space-y-4">
+                    <div className="mt-3 flex gap-2">
                         {events.map((ev) => (
                             <div
                                 key={ev.id}

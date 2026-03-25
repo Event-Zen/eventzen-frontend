@@ -246,13 +246,13 @@ export default function PlannerProfilePage() {
                             </div>
                         ))}
 
-                        <button
-                            type="button"
-                            onClick={onCreate}
-                            className="inline-flex rounded-md bg-red-700 px-6 py-2 text-xs font-semibold text-white hover:bg-red-800"
-                        >
-                            Create
-                        </button>
+                         <button
+                                        onClick={() => openGoogleCalendar(ev)}
+                                        className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-md text-xs"
+                                    >
+                                        <FaCalendarAlt />
+                                        Calendar
+                                    </button>
                     </div>
                 </div>
             </div>

@@ -141,6 +141,8 @@ function InlineCalendar({
                     const isToday = sameDay(date, today);
                     const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                     const isPast = date < todayNormalized;
+                    const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    const isPast = date < todayNormalized;
 
                     return (
                         <button

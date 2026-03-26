@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getMyEvents, getEventById } from "../shared/api/eventClient";
 
 type Planner = {
     name: string;
@@ -14,8 +15,9 @@ type PlannerEvent = {
     id: string;
     title: string;
     description: string;
-    progressLabel: string; // "Completed" | "Up Coming"
+    progressLabel: string;
     progressColor: "green" | "blue";
+    vendorsCount?: number;
 };
 
 function FieldRow({
@@ -70,24 +72,32 @@ export default function PlannerProfilePage() {
     const [draft, setDraft] = useState<Planner>(initialPlanner);
     const [isEditing, setIsEditing] = useState(false);
 
-    const [events] = useState<PlannerEvent[]>([
-        {
-            id: "e1",
-            title: "Gala Night Extravaganza",
-            description:
-                "A glamorous evening filled with live music, exquisite dining, and dancing. Perfect for corporate gatherings or charity fundraisers",
-            progressLabel: "Completed",
-            progressColor: "green",
-        },
-        {
-            id: "e2",
-            title: "Foodie Fest",
-            description:
-                "A culinary festival showcasing a variety of food trucks, local restaurants, and gourmet chefs. Attendees can enjoy tastings, cooking demos, and food-related workshops.",
-            progressLabel: "Up Coming",
-            progressColor: "blue",
-        },
-    ]);
+    const [events, setEvents] = useState<PlannerEvent[]>([]);
+    const [loadingEvents, setLoadingEvents] = useState(true);
+
+    useEffect(() => {
+        async function fetchMyEvents() {
+            try {
+                const response = await getMyEvents();
+                const fetched = response.data || [];
+                const mapped: PlannerEvent[] = fetched.map((ev: any) => ({
+                    id: ev._id,
+                    title: ev.title,
+                    description: ev.description || "No description provided",
+                    progressLabel: ev.status === "published" ? "Published" : "Draft",
+                    progressColor: ev.status === "published" ? "green" : "blue",
+                    vendorsCount: ev.selectedVendors ? ev.selectedVendors.length : 0
+                }));
+                mapped.reverse(); // newest first
+                setEvents(mapped);
+            } catch (err) {
+                console.error("Failed to load planner events", err);
+            } finally {
+                setLoadingEvents(false);
+            }
+        }
+        fetchMyEvents();
+    }, []);
 
     const startEdit = () => {
         setDraft(planner);
@@ -105,8 +115,64 @@ export default function PlannerProfilePage() {
         setIsEditing(false);
     };
 
-    const onEditEvent = (id: string) => {
-        alert(`Edit event (demo): ${id}`);
+    const onEditEvent = async (id: string, isPublished: boolean) => {
+        try {
+            setLoadingEvents(true);
+            const response = await getEventById(id);
+            const ev = response.data;
+            if (!ev) throw new Error("Event not found");
+
+            let cleanDesc = ev.description || "";
+            let cap = "";
+            let tPrice = "";
+            let eType = "Selection";
+
+            if (cleanDesc.includes("| Capacity:")) {
+                const parts = cleanDesc.split("|");
+                cleanDesc = parts[0] ? parts[0].trim() : "";
+                cap = parts.find((p: string) => p.includes("Capacity:"))?.replace("Capacity:", "").trim() || "";
+                eType = parts.find((p: string) => p.includes("Type:"))?.replace("Type:", "").trim() || "Selection";
+                tPrice = parts.find((p: string) => p.includes("Price:"))?.replace("Price:", "").trim() || "";
+            }
+
+            const formData = {
+                title: ev.title || "",
+                description: cleanDesc,
+                location: ev.location || "",
+                date: ev.startDateTime ? new Date(ev.startDateTime) : null,
+                startTime: ev.startDateTime ? ev.startDateTime.split("T")[1]?.substring(0, 5) : "",
+                endTime: ev.endDateTime ? ev.endDateTime.split("T")[1]?.substring(0, 5) : "",
+                eventMode: ev.locationType === "online" ? "virtual" : "physical",
+                eventType: eType,
+                capacity: cap,
+                ticketPrice: tPrice,
+            };
+
+            const vendorMap: Record<string, string | null> = {};
+            if (ev.selectedVendors && Array.isArray(ev.selectedVendors)) {
+                ev.selectedVendors.forEach((v: any) => {
+                    if (v.category && v.vendorId) {
+                        vendorMap[v.category] = v.vendorId;
+                    }
+                });
+            }
+
+            sessionStorage.setItem("createEventForm", JSON.stringify(formData));
+            sessionStorage.setItem("activeEventId", id);
+            
+            if (Object.keys(vendorMap).length > 0) {
+                 sessionStorage.setItem("serviceSelections", JSON.stringify(vendorMap));
+            } else {
+                 sessionStorage.removeItem("serviceSelections");
+            }
+
+            navigate("/create-event", { state: { lockedVendors: isPublished } });
+        } catch (error) {
+            console.error("Failed to fetch event for edit", error);
+            alert("Could not load full event details.");
+        } finally {
+            setLoadingEvents(false);
+        }
     };
 
     const onCreate = () => {
@@ -214,37 +280,54 @@ export default function PlannerProfilePage() {
                     <h2 className="text-center font-semibold text-slate-900">Your Events</h2>
 
                     <div className="mt-6 space-y-4">
-                        {events.map((ev) => (
-                            <div
-                                key={ev.id}
-                                className="relative rounded-xl bg-slate-200 px-5 py-4 text-slate-900"
-                            >
-                                <button
-                                    type="button"
-                                    onClick={() => onEditEvent(ev.id)}
-                                    className="absolute right-3 top-3 rounded-full p-1.5 text-slate-700 hover:bg-slate-300"
-                                    title="Edit event"
-                                >
-                                    <Pencil className="h-4 w-4" />
-                                </button>
-
-                                <div className="text-sm font-semibold">{ev.title}</div>
-                                <div className="mt-2 text-xs text-slate-800">{ev.description}</div>
-
-                                <div className="mt-3 text-xs font-semibold">
-                                    Progress :{" "}
-                                    <span
-                                        className={
-                                            ev.progressColor === "green"
-                                                ? "text-green-700"
-                                                : "text-blue-700"
-                                        }
-                                    >
-                                        {ev.progressLabel}
-                                    </span>
-                                </div>
+                        {loadingEvents ? (
+                            <div className="flex justify-center py-5">
+                                <p className="text-sm font-semibold text-slate-500 animate-pulse">Loading your events...</p>
                             </div>
-                        ))}
+                        ) : events.length === 0 ? (
+                            <div className="flex justify-center py-5">
+                                <p className="text-sm font-semibold text-slate-500">No events found. Start planning!</p>
+                            </div>
+                        ) : (
+                            events.map((ev) => (
+                                <div
+                                    key={ev.id}
+                                    className="relative rounded-xl bg-slate-200 px-5 py-4 text-slate-900"
+                                >
+                                    <button
+                                        type="button"
+                                        onClick={() => onEditEvent(ev.id, ev.progressLabel === 'Published')}
+                                        className="absolute right-3 top-3 rounded-full p-1.5 text-slate-700 hover:bg-slate-300"
+                                        title="Edit event"
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                    </button>
+
+                                    <div className="text-sm font-semibold pr-8">{ev.title}</div>
+                                    <div className="mt-2 text-xs text-slate-800 line-clamp-2">{ev.description}</div>
+
+                                    <div className="mt-3 text-xs font-semibold flex items-center gap-4">
+                                        <div>
+                                            Status:{" "}
+                                            <span
+                                                className={
+                                                    ev.progressColor === "green"
+                                                        ? "text-emerald-700"
+                                                        : "text-blue-700"
+                                                }
+                                            >
+                                                {ev.progressLabel}
+                                            </span>
+                                        </div>
+                                        {typeof ev.vendorsCount === 'number' && ev.vendorsCount > 0 && (
+                                            <div className="text-slate-600 font-medium tracking-wide">
+                                                Vendors Hired: <span className="text-slate-900 font-bold">{ev.vendorsCount}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
 
                         <button
                             type="button"

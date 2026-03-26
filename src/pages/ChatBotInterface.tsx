@@ -4,6 +4,42 @@ function ChatBotInterface() {
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+
+    const initialMessages = [
+    {
+      id: 1,
+      sender: 'user',
+      text: 'What are the services provided by EventZen?'
+    },
+    {
+      id: 2,
+      sender: 'bot',
+      text: (
+        <>
+          <p className="mb-2">Sure, here are the sentences for each point:</p>
+          <ol className="list-decimal pl-4 space-y-1 text-[#6B7280]">
+            <li><strong className="font-medium text-[#4B5563]">AI Support For Event Planning:</strong> Our advanced AI tools assist planners in organizing seamless events by providing intelligent recommendations and automating routine tasks.</li>
+            <li><strong className="font-medium text-[#4B5563]">Budget Planning Support:</strong> We offer comprehensive budget planning tools to help you manage your event expenses efficiently and stay within your financial limits.</li>
+            <li><strong className="font-medium text-[#4B5563]">Virtual Event Support:</strong> Our platform enables you to host engaging virtual events with robust features for live streaming, interactive sessions, and attendee management.</li>
+          </ol>
+          <p className="mt-2">Would you like any further details or modifications?</p>
+        </>
+      )
+    },
+    {
+      id: 3,
+      sender: 'user',
+      text: 'Thank You :)'
+    }
+  ];
+
+  const [messages, setMessages] = useState(initialMessages);
+
+
+  const handleNewChat = () => {
+    setMessages([]);
+  };
+
   return (
     <div className="min-h-screen bg-[#050B1B] flex items-center justify-center p-8 font-sans">
       
@@ -12,7 +48,6 @@ function ChatBotInterface() {
         
         {/* Left Sidebar */}
         <div className={`transition-all duration-300 ease-in-out shrink-0 overflow-hidden bg-[#0A0F1D] relative z-0 ${isSidebarOpen ? 'w-[340px]' : 'w-0'}`}>
-
           <div className="w-[340px] h-full p-6 flex flex-col relative z-10">
             {/* Hamburger (Close) */}
             <div className="flex justify-end mb-8">
@@ -30,7 +65,10 @@ function ChatBotInterface() {
             </div>
 
             {/* New Chat Button */}
-            <button className="flex items-center gap-4 p-4 bg-[#111625] border border-white/10 rounded-xl mb-4 text-white hover:bg-white/5 transition">
+            <button 
+              onClick={handleNewChat}
+              className="flex items-center gap-4 p-4 bg-[#111625] border border-white/10 rounded-xl mb-4 text-white hover:bg-white/5 transition"
+            >
               <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -41,7 +79,7 @@ function ChatBotInterface() {
             </button>
 
             {/* Recent Chats Dropdown */}
-            <button className="flex items-center gap-4 p-4 bg-[#111625] border border-white/10 rounded-xl mb-4 text-white/70 hover:bg-white/5 transition">
+            <button className="flex items-center gap-4 p-4 bg-[#111625] border border-white/10 rounded-xl mb-4 text-white/70 hover:bg-white/5 transition w-full">
               <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="6 9 12 15 18 9"></polyline>
@@ -80,8 +118,6 @@ function ChatBotInterface() {
           
           {/* Header Actions */}
           <div className="flex justify-between items-center mb-6">
-            
-            {/* Left side of header: Hamburger (Only visible when sidebar is closed) */}
             <div className="flex items-center">
               {!isSidebarOpen && (
                 <button 
@@ -98,9 +134,7 @@ function ChatBotInterface() {
               )}
             </div>
 
-            {/* Right side of header: Actions & Search */}
             <div className="flex items-center gap-5 ml-auto">
-              {/* Alert Icon */}
               <button className="text-[#E06A4F] hover:opacity-80 transition">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
@@ -108,8 +142,10 @@ function ChatBotInterface() {
                   <line x1="12" y1="17" x2="12.01" y2="17"></line>
                 </svg>
               </button>
-              {/* Trash Icon */}
-              <button className="text-[#2B3A67] hover:opacity-80 transition">
+              <button 
+                onClick={handleNewChat}
+                className="text-[#2B3A67] hover:opacity-80 transition"
+              >
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -117,7 +153,6 @@ function ChatBotInterface() {
                   <line x1="14" y1="11" x2="14" y2="17"></line>
                 </svg>
               </button>
-              {/* Search Bar */}
               <div className="relative hidden sm:block">
                 <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"></circle>
@@ -130,74 +165,62 @@ function ChatBotInterface() {
 
           {/* Chat Bubbles */}
           <div className="flex-1 overflow-y-auto flex flex-col gap-8 pr-2">
-            
-            {/* User Message 1 */}
-            <div className="flex justify-end items-end gap-3">
-              <div className="relative group">
-                <button className="absolute -left-10 top-1/2 -translate-y-1/2 text-gray-600 opacity-0 group-hover:opacity-50 hover:!opacity-100 transition">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
-                </button>
-                <div className="bg-white px-6 py-5 rounded-2xl rounded-br-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] text-[#4B5563] max-w-xl text-[15px] font-medium">
-                  What are the services provided by EventZen?
-                </div>
+            {messages.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center text-gray-500">
+                <p>Start a new conversation...</p>
               </div>
-              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-sm"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=fbd38d" alt="User Avatar" /></div>
-            </div>
-
-            {/* Bot Message */}
-            <div className="flex justify-start items-end gap-3">
-              <div className="w-8 h-8 rounded-full bg-teal-100 overflow-hidden shrink-0 shadow-sm border border-white"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=Zen&backgroundColor=b2f5ea" alt="Bot Avatar" /></div>
-              <div className="relative group">
-                <button className="absolute -right-10 top-1/2 -translate-y-1/2 text-gray-600 opacity-0 group-hover:opacity-50 hover:!opacity-100 transition">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
-                </button>
-                <div className="bg-white p-6 rounded-2xl rounded-bl-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] text-[#4B5563] max-w-2xl text-[15px] leading-relaxed border-l-4 border-[#1E2B58]">
-                  <p className="mb-2">Sure, here are the sentences for each point:</p>
-                  <ol className="list-decimal pl-4 space-y-1 text-[#6B7280]">
-                    <li><strong className="font-medium text-[#4B5563]">AI Support For Event Planning:</strong> Our advanced AI tools assist planners in organizing seamless events by providing intelligent recommendations and automating routine tasks.</li>
-                    <li><strong className="font-medium text-[#4B5563]">Budget Planning Support:</strong> We offer comprehensive budget planning tools to help you manage your event expenses efficiently and stay within your financial limits.</li>
-                    <li><strong className="font-medium text-[#4B5563]">Virtual Event Support:</strong> Our platform enables you to host engaging virtual events with robust features for live streaming, interactive sessions, and attendee management.</li>
-                  </ol>
-                  <p className="mt-2">Would you like any further details or modifications?</p>
-                </div>
-              </div>
-            </div>
-
-            {/* User Message 2 */}
-            <div className="flex justify-end items-end gap-3">
-               <div className="relative group">
-                <button className="absolute -left-10 top-1/2 -translate-y-1/2 text-gray-600 opacity-0 group-hover:opacity-50 hover:!opacity-100 transition">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
-                </button>
-                <div className="bg-white px-6 py-4 rounded-2xl rounded-br-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] text-[#4B5563] max-w-xl text-[15px] font-medium">
-                  Thank You :)
-                </div>
-              </div>
-              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-sm"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=fbd38d" alt="User Avatar" /></div>
-            </div>
-
+            ) : (
+              messages.map((msg) => (
+                msg.sender === 'user' ? (
+                  /* User Message */
+                  <div key={msg.id} className="flex justify-end items-end gap-3">
+                    <div className="relative group">
+                      <button className="absolute -left-10 top-1/2 -translate-y-1/2 text-gray-600 opacity-0 group-hover:opacity-50 hover:!opacity-100 transition">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                      </button>
+                      <div className="bg-white px-6 py-5 rounded-2xl rounded-br-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] text-[#4B5563] max-w-xl text-[15px] font-medium">
+                        {msg.text}
+                      </div>
+                    </div>
+                    <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-sm">
+                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=fbd38d" alt="User Avatar" />
+                    </div>
+                  </div>
+                ) : (
+                  /* Bot Message */
+                  <div key={msg.id} className="flex justify-start items-end gap-3">
+                    <div className="w-8 h-8 rounded-full bg-teal-100 overflow-hidden shrink-0 shadow-sm border border-white">
+                      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Zen&backgroundColor=b2f5ea" alt="Bot Avatar" />
+                    </div>
+                    <div className="relative group">
+                      <button className="absolute -right-10 top-1/2 -translate-y-1/2 text-gray-600 opacity-0 group-hover:opacity-50 hover:!opacity-100 transition">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                      </button>
+                      <div className="bg-white p-6 rounded-2xl rounded-bl-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] text-[#4B5563] max-w-2xl text-[15px] leading-relaxed border-l-4 border-[#1E2B58]">
+                        {msg.text}
+                      </div>
+                    </div>
+                  </div>
+                )
+              ))
+            )}
           </div>
 
           {/* Bottom Input */}
           <div className="mt-6 bg-white rounded-2xl p-2 flex items-center shadow-lg border border-gray-100">
             <input type="text" placeholder="Type a new message here" className="flex-1 px-5 py-3 outline-none text-[#4B5563] bg-transparent text-[15px]" />
             <div className="flex items-center gap-5 pr-4 text-[#4B5563]">
-              {/* Attachment Icon */}
               <button className="hover:text-black transition">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                 </svg>
               </button>
-              {/* Smiley Icon */}
               <button className="hover:text-black transition">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
@@ -206,7 +229,6 @@ function ChatBotInterface() {
                   <line x1="15" y1="9" x2="15.01" y2="9"></line>
                 </svg>
               </button>
-              {/* Send Icon */}
               <button className="hover:text-black transition">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13"></line>

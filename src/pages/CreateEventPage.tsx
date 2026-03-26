@@ -185,7 +185,7 @@ export default function CreateEventPage() {
         navigate("/");
     };
 
-    const onNext = (e: React.FormEvent) => {
+    const onNext = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // Demo: replace with your real flow (stepper / API)

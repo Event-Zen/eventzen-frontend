@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createEvent } from "../shared/api/eventClient";
+import React, { useMemo, useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { createEvent, updateEvent } from "../shared/api/eventClient";
 
 type EventType = "physical" | "virtual";
 
@@ -167,27 +167,46 @@ function InlineCalendar({
 
 export default function CreateEventPage() {
     const navigate = useNavigate();
+    const routerLocation = useLocation();
+    const lockedVendors = routerLocation.state?.lockedVendors;
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const [form, setForm] = useState<FormState>({
-        title: "",
-        description: "",
-        location: "",
-        date: null,
-        startTime: "",
-        endTime: "",
-        eventMode: "physical",
-        eventType: "Selection",
-        capacity: "",
-        ticketPrice: "",
+    const [form, setForm] = useState<FormState>(() => {
+        const saved = sessionStorage.getItem("createEventForm");
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (parsed.date) parsed.date = new Date(parsed.date);
+                return parsed;
+            } catch (e) {}
+        }
+        return {
+            title: "",
+            description: "",
+            location: "",
+            date: null,
+            startTime: "",
+            endTime: "",
+            eventMode: "physical",
+            eventType: "Selection",
+            capacity: "",
+            ticketPrice: "",
+        };
     });
+
+    useEffect(() => {
+        sessionStorage.setItem("createEventForm", JSON.stringify(form));
+    }, [form]);
 
     const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
         setForm((p) => ({ ...p, [key]: value }));
     };
 
     const onCancel = () => {
+        sessionStorage.removeItem("createEventForm");
+        sessionStorage.removeItem("activeEventId");
+        sessionStorage.removeItem("serviceSelections");
         navigate("/");
     };
 
@@ -214,11 +233,30 @@ export default function CreateEventPage() {
                 endDateTime,
                 locationType: form.eventMode === "virtual" ? "online" : "physical",
                 location: form.location,
-                status: "published"
+                status: "draft"
             };
 
-            await createEvent(payload);
-            navigate("/services");
+            const activeId = sessionStorage.getItem("activeEventId");
+            let eventId = activeId;
+            
+            if (activeId) {
+                await updateEvent(activeId, payload);
+            } else {
+                const response = await createEvent(payload);
+                eventId = response.data?._id;
+                if (eventId) {
+                    sessionStorage.setItem("activeEventId", eventId);
+                }
+            }
+            
+            if (lockedVendors) {
+                sessionStorage.removeItem("createEventForm");
+                sessionStorage.removeItem("activeEventId");
+                sessionStorage.removeItem("serviceSelections");
+                navigate("/planner-profile");
+            } else {
+                navigate("/services", { state: { eventId } });
+            }
         } catch (err: any) {
             console.error(err);
             setError(err.response?.data?.message || err.message || "Failed to create event");
@@ -398,7 +436,7 @@ export default function CreateEventPage() {
                                         disabled={loading}
                                         className="rounded bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                                     >
-                                        {loading ? "Creating..." : "Next"}
+                                        {loading ? "Creating..." : lockedVendors ? "Save & Exit" : "Next"}
                                     </button>
                                 </div>
                                 {error && (

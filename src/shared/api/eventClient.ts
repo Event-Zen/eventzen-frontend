@@ -13,3 +13,13 @@ eventApi.interceptors.request.use((config) => {
   }
   return config;
 });
+
+export const createEvent = async (payload: any) => {
+  const response = await eventApi.post("/", payload);
+  return response.data;
+};
+
+export const listPublishedEvents = async () => {
+  const response = await eventApi.get("/");
+  return response.data;
+};

@@ -1,14 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { listPublishedEvents } from "../shared/api/eventClient";
-
-type BackendEvent = {
-  _id: string;
-  title: string;
-  description?: string;
-  image?: string;
-};
-
 
 type EventItem = {
   id: string;
@@ -18,25 +9,40 @@ type EventItem = {
   image?: string;
 };
 
+import { listPublishedEvents } from "../shared/api/eventClient";
 
+type BackendEvent = {
+  _id: string;
+  title: string;
+  description?: string;
+  image?: string;
+};
 
 export default function UpcomingEventsPage() {
   const navigate = useNavigate();
   const [upcomingEvents, setUpcomingEvents] = React.useState<EventItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
   React.useEffect(() => {
     async function fetchEvents() {
       try {
         const responseData = await listPublishedEvents();
+        // Assume API returns { success: true, data: [...] }
         const data = responseData.data || [];
         const mappedEvents: EventItem[] = data.map((ev: BackendEvent, i: number) => ({
           id: ev._id,
           title: ev.title,
           description: ev.description || "",
-          ticketPrice: "Rs. 1,000.00",
-          image: ev.image || `/images/events/event${(i % 6) + 1}.jpg`
+          ticketPrice: "Rs. 1,000.00", // Fallback or parse from description if available
+          image: ev.image || `/images/events/event${(i % 6) + 1}.jpg`, // Use dummy images cycle
         }));
         setUpcomingEvents(mappedEvents);
-      } catch (err: any) {}
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch events");
+      } finally {
+        setLoading(false);
+      }
     }
     fetchEvents();
   }, []);
@@ -45,6 +51,22 @@ export default function UpcomingEventsPage() {
     console.log("Selected event:", eventId);
     navigate("/payment");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-140px)] bg-slate-50 px-6 py-10 flex items-center justify-center">
+        <p className="text-xl font-semibold text-slate-500">Loading events...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[calc(100vh-140px)] bg-slate-50 px-6 py-10 flex items-center justify-center">
+        <p className="text-xl font-semibold text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-140px)] bg-slate-50 px-6 py-10">

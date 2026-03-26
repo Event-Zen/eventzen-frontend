@@ -146,7 +146,8 @@ function InlineCalendar({
                         <button
                             key={date.toISOString()}
                             type="button"
-                            onClick={() => onChange(date)}
+                            disabled={isPast}
+                            onClick={() => { if (!isPast) onChange(date); }}
                             className={[
                                 "h-6 rounded text-xs",
                                 inMonth ? "text-slate-700" : "text-slate-400",

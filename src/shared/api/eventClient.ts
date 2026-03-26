@@ -38,3 +38,8 @@ export const getMyEvents = async () => {
   const response = await eventApi.get("/my");
   return response.data;
 };
+
+export const getEventById = async (id: string) => {
+  const response = await eventApi.get(`/${id}`);
+  return response.data;
+};

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createEvent } from "../shared/api/eventClient";
 
 type EventType = "physical" | "virtual";
 
@@ -163,6 +164,8 @@ function InlineCalendar({
 
 export default function CreateEventPage() {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const [form, setForm] = useState<FormState>({
         title: "",
@@ -187,31 +190,38 @@ export default function CreateEventPage() {
 
     const onNext = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError(null);
 
-        // Demo: replace with your real flow (stepper / API)
-        const fullDesc = `${form.description || ''} | Capacity: ${form.capacity || 'N/A'} | Type: ${form.eventType} | Price: ${form.ticketPrice || 'Free'}`;
-        
-        const startDateTime = form.date 
-            ? new Date(`${toYMD(form.date)}T${form.startTime || "00:00"}`)
-            : new Date();
+        try {
+            setLoading(true);
+            const fullDesc = `${form.description || ''} | Capacity: ${form.capacity || 'N/A'} | Type: ${form.eventType} | Price: ${form.ticketPrice || 'Free'}`;
             
-        const endDateTime = form.date 
-            ? new Date(`${toYMD(form.date)}T${form.endTime || "23:59"}`)
-            : new Date();
+            const startDateTime = form.date 
+                ? new Date(`${toYMD(form.date)}T${form.startTime || "00:00"}`)
+                : new Date();
+                
+            const endDateTime = form.date 
+                ? new Date(`${toYMD(form.date)}T${form.endTime || "23:59"}`)
+                : new Date();
 
-        const payload = {
-            title: form.title,
-            description: fullDesc,
-            startDateTime,
-            endDateTime,
-            locationType: form.eventMode === "virtual" ? "online" : "physical",
-            location: form.location,
-            status: "published"
-        };
-        console.log("Next payload:", payload);
-        // alert("Next (demo). You can route to step-2 or submit to backend.");
-        // Redirect to services page
-        navigate("/services");
+            const payload = {
+                title: form.title,
+                description: fullDesc,
+                startDateTime,
+                endDateTime,
+                locationType: form.eventMode === "virtual" ? "online" : "physical",
+                location: form.location,
+                status: "published"
+            };
+
+            await createEvent(payload);
+            navigate("/services");
+        } catch (err: any) {
+            console.error(err);
+            setError(err.response?.data?.message || err.message || "Failed to create event");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -382,11 +392,17 @@ export default function CreateEventPage() {
 
                                     <button
                                         type="submit"
-                                        className="rounded bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-700"
+                                        disabled={loading}
+                                        className="rounded bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                                     >
-                                        Next
+                                        {loading ? "Creating..." : "Next"}
                                     </button>
                                 </div>
+                                {error && (
+                                    <p className="mt-4 text-xs font-semibold text-red-600">
+                                        Error: {error}
+                                    </p>
+                                )}
                             </div>
                         </form>
                     </div>

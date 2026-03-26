@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useMemo, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { selectVendorsApi } from "../shared/api/eventClient";
 
 type ServiceItem = {
   id: string;
@@ -21,6 +22,12 @@ const LKR = (n: number) =>
 
 const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [saving, setSaving] = useState(false);
+
+  // Get eventId from router state or sessionStorage
+  const eventId: string | null =
+    (location.state as any)?.eventId || sessionStorage.getItem("activeEventId");
 
   // TODO: Replace with your real data later (API/context)
   const categories: ServiceCategory[] = useMemo(
@@ -182,6 +189,18 @@ const ServicesPage: React.FC = () => {
     return init;
   });
 
+  // Hydrate vendor selections from sessionStorage (set by PlannerProfilePage on edit)
+  useEffect(() => {
+    const saved = sessionStorage.getItem("serviceSelections");
+    if (!saved) return;
+    try {
+      const parsed: Record<string, string | null> = JSON.parse(saved);
+      setSelectedByCategory((prev) => ({ ...prev, ...parsed }));
+    } catch (e) {
+      console.error("Failed to parse saved serviceSelections", e);
+    }
+  }, []);
+
   const toggleSelect = (categoryId: string, itemId: string) => {
     setSelectedByCategory((prev) => ({
       ...prev,
@@ -217,6 +236,53 @@ const ServicesPage: React.FC = () => {
     [otherServices]
   );
   const grandTotal = selectedTotal + otherTotal;
+
+  // Save vendor selections to backend and navigate to payment
+  const onFinish = async () => {
+    if (!eventId) {
+      alert("No event found. Please create an event first.");
+      return;
+    }
+
+    if (selectedItems.length === 0) {
+      alert("Please select at least one service.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      // Build vendor payload for the API
+      const vendors = selectedItems.map((item) => {
+        // Find which category this item belongs to
+        const cat = categories.find((c) => c.items.some((i) => i.id === item.id));
+        return {
+          vendorId: item.id,
+          serviceId: item.id,
+          price: item.price,
+          category: cat?.id || "",
+          vendorNameSnapshot: item.vendor,
+          serviceNameSnapshot: item.name,
+        };
+      });
+
+      await selectVendorsApi(eventId, { vendors, currency: "LKR" });
+
+      // Persist selections in sessionStorage for potential re-editing
+      const selectionMap: Record<string, string | null> = {};
+      for (const cat of categories) {
+        selectionMap[cat.id] = selectedByCategory[cat.id];
+      }
+      sessionStorage.setItem("serviceSelections", JSON.stringify(selectionMap));
+
+      navigate("/payment", { state: { eventId } });
+    } catch (err: any) {
+      console.error("Failed to save vendor selections", err);
+      alert(err.response?.data?.message || err.message || "Failed to save vendor selections.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="w-full px-6 py-6">
@@ -364,10 +430,11 @@ const ServicesPage: React.FC = () => {
           
 
           <button
-            onClick={() => navigate("/payment")}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
+            onClick={onFinish}
+            disabled={saving}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            Finish
+            {saving ? "Saving..." : "Finish"}
           </button>
 
           <button

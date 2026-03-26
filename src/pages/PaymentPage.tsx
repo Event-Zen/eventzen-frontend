@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { updateEvent } from "../shared/api/eventClient";
 
 // Load Stripe outside of components to avoid recreating the object
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "", {
   developerTools: { assistant: { enabled: false } }
 });
 
-function CheckoutForm() {
+function CheckoutForm({ eventId }: { eventId: string | null }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -30,8 +31,22 @@ function CheckoutForm() {
     if (error) {
       setErrorMessage(error.message ?? "An unknown error occurred");
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
+      // Update event status to "published" after successful payment
+      if (eventId) {
+        try {
+          await updateEvent(eventId, { status: "published" });
+        } catch (updateErr) {
+          console.error("Failed to update event status:", updateErr);
+        }
+      }
+
+      // Clean up sessionStorage
+      sessionStorage.removeItem("createEventForm");
+      sessionStorage.removeItem("activeEventId");
+      sessionStorage.removeItem("serviceSelections");
+
       alert(`Success! Payment was securely confirmed by Stripe. \nStripe Output ID: ${paymentIntent.id}`);
-      navigate("/"); // Redirect to home or confirmation page
+      navigate("/planner-profile"); // Redirect to planner profile to see updated status
     }
     setIsProcessing(false);
   };
@@ -58,8 +73,13 @@ function CheckoutForm() {
 
 export default function PaymentPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [clientSecret, setClientSecret] = useState<string>("");
   const [initialError, setInitialError] = useState("");
+
+  // Get eventId from router state or sessionStorage
+  const eventId: string | null =
+    (location.state as any)?.eventId || sessionStorage.getItem("activeEventId");
 
   useEffect(() => {
     // Connect to backend to create intent and fetch secret on load
@@ -69,7 +89,7 @@ export default function PaymentPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            eventId: "evt_123", // Mock data
+            eventId: eventId || "evt_unknown",
             userId: "usr_456",
             amount: 50,
             currency: "usd",
@@ -88,7 +108,7 @@ export default function PaymentPage() {
       }
     };
     fetchIntent();
-  }, []);
+  }, [eventId]);
 
   return (
     <div className="relative min-h-screen bg-white overflow-hidden">
@@ -138,7 +158,7 @@ export default function PaymentPage() {
               </div>
             ) : clientSecret ? (
               <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <CheckoutForm />
+                <CheckoutForm eventId={eventId} />
               </Elements>
             ) : (
               <div className="mt-8 flex flex-col justify-center items-center py-10 space-y-4">

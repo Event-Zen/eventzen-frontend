@@ -28,3 +28,8 @@ export const listPublishedEvents = async () => {
   const response = await eventApi.get("/");
   return response.data;
 };
+
+export const selectVendorsApi = async (eventId: string, payload: any) => {
+  const response = await eventApi.post(`/${eventId}/vendors/select`, payload);
+  return response.data;
+};

@@ -139,6 +139,8 @@ function InlineCalendar({
                 {days.map(({ date, inMonth }) => {
                     const isSelected = value ? sameDay(date, value) : false;
                     const isToday = sameDay(date, today);
+                    const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    const isPast = date < todayNormalized;
 
                     return (
                         <button

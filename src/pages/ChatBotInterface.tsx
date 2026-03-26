@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useAuthUser } from '../features/auth/hooks/useAuthUser';
 
 function ChatBotInterface() {
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const { user } = useAuthUser();
 
 
     const initialMessages = [
@@ -103,7 +105,7 @@ function ChatBotInterface() {
                 </div>
                 <div>
                   <p className="text-[10px] text-gray-500 font-medium tracking-wide">Welcome back,</p>
-                  <p className="text-[14px] font-bold text-gray-900 leading-tight">Kasun Madushan</p>
+                  <p className="text-[14px] font-bold text-gray-900 leading-tight">{user?.name || 'Guest'}</p>
                 </div>
               </div>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

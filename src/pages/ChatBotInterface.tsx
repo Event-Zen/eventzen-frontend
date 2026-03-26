@@ -1,218 +1,193 @@
-import React from "react";
+import React from 'react';
 
 function ChatBotInterface() {
   return (
-    <div className="min-h-screen bg-[#060B19] flex items-center justify-center p-8 font-sans">
-      <div className="flex w-full max-w-6xl h-[85vh] bg-[#9396A0] rounded-3xl overflow-hidden border-8 border-[#F3F4F6]/20">
-        {/* Left Side bar */}
-        <div className="w-1/3 max-w-[320px] bg-[#0A0F1C] flex flex-col p-4 relative">
-          <div className="flex justify-end mb-8">
-            <button className="p-2 border border-white/20 rounded-md text-white">
-              <svg
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M4 6h16M4 12h16M4 18h16"></path>
-              </svg>
+    <div className="min-h-screen bg-[#050B1B] flex items-center justify-center p-8 font-sans">
+      
+      {/* Main Container */}
+      <div className="flex w-full max-w-6xl h-[90vh] bg-[#9CA3AF] rounded-[2rem] overflow-hidden border-4 border-white/20 shadow-2xl">
+        
+        {/* Left Sidebar (Solid Dark) */}
+        <div className="w-1/3 max-w-[340px] bg-[#0A0F1D] flex flex-col p-6 relative overflow-hidden z-0">
+          
+          <div className="relative z-10 flex flex-col h-full">
+            {/* Hamburger */}
+            <div className="flex justify-end mb-8">
+              <button className="p-2.5 border border-white/20 rounded-lg text-white hover:bg-white/10 transition">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            {/* New Chat Button */}
+            <button className="flex items-center gap-4 p-4 bg-[#111625] border border-white/10 rounded-xl mb-4 text-white hover:bg-white/5 transition">
+              <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </div>
+              <span className="text-[15px] font-medium">New Chat</span>
             </button>
-          </div>
 
-          <button className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl mb-4 text-white">
-            <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
-              +
-            </div>
-            <span className="text-sm font-medium">New Chat</span>
-          </button>
-
-          <button className="flex items-center gap-4 p-4 bg-[#0A0F1C] border border-white/10 rounded-xl mb-2 text-white/70">
-            <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
-              v
-            </div>
-            <span className="text-sm font-medium">Recent Chats</span>
-          </button>
-
-          <div className="flex flex-col gap-2 overflow-y-auto mt-2">
-            <div className="p-4 border border-white/5 rounded-xl text-white/60 text-sm cursor-pointer hover:bg-white/5">
-              How to reduce the budget?
-            </div>
-            <div className="p-4 border border-white/5 rounded-xl text-white/60 text-sm cursor-pointer hover:bg-white/5">
-              How to organize an event
-            </div>
-            <div className="p-4 border border-white/5 rounded-xl text-white/60 text-sm cursor-pointer hover:bg-white/5">
-              What is the minimum price for music and light?
-            </div>
-          </div>
-
-          <div className="mt-auto bg-[#F9FAFB] rounded-xl p-4 flex items-center justify-between cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-200 rounded-md overflow-hidden">
-                <img
-                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-                  alt="User"
-                />
+            {/* Recent Chats Dropdown */}
+            <button className="flex items-center gap-4 p-4 bg-[#111625] border border-white/10 rounded-xl mb-4 text-white/70 hover:bg-white/5 transition">
+              <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </div>
-              <div>
-                <p className="text-[11px] text-gray-500 uppercase tracking-wide">
-                  Welcome back,
-                </p>
-                <p className="text-sm font-bold text-gray-900">
-                  Kasun Madushan
-                </p>
-              </div>
+              <span className="text-[15px] font-medium">Recent Chats</span>
+            </button>
+
+            {/* Chat History */}
+            <div className="flex flex-col gap-3 overflow-y-auto mb-4">
+              <div className="p-4 bg-[#111625] border border-white/5 rounded-xl text-white/80 text-[14px] leading-snug cursor-pointer hover:bg-white/5 transition">How to reduce the budget?</div>
+              <div className="p-4 border border-transparent hover:border-white/5 hover:bg-[#111625] rounded-xl text-white/60 text-[14px] cursor-pointer transition">How to organize an event</div>
+              <div className="p-4 border border-transparent hover:border-white/5 hover:bg-[#111625] rounded-xl text-white/60 text-[14px] cursor-pointer transition">What is the minimum price for music and light?</div>
             </div>
-            <svg
-              width="20"
-              height="20"
-              fill="none"
-              stroke="#6B7280"
-              strokeWidth="2"
-            >
-              <path d="M18 15l-6-6-6 6"></path>
-            </svg>
+
+            {/* User Profile */}
+            <div className="mt-auto bg-white rounded-xl p-3 flex items-center justify-between shadow-lg cursor-pointer hover:bg-gray-50 transition">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-200 rounded-md overflow-hidden">
+                   <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=fbd38d" alt="User" className="w-full h-full object-cover"/>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wide">Welcome back,</p>
+                  <p className="text-[14px] font-bold text-gray-900 leading-tight">Kasun Madushan</p>
+                </div>
+              </div>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>
+            </div>
           </div>
         </div>
 
-        {/* Right Area */}
-        <div className="flex-1 flex flex-col p-6 relative">
-          <div className="flex justify-end items-center gap-6 mb-8">
-            <button className="text-[#E87B5D]">
-              <svg
-                width="24"
-                height="24"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M12 2L1 21h22M12 9v5m0 4h.01"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
+        {/* Right Main Chat Area */}
+        <div className="flex-1 flex flex-col px-8 py-6 relative">
+          
+          {/* Header Actions */}
+          <div className="flex justify-end items-center gap-5 mb-6">
+            {/* Alert Icon */}
+            <button className="text-[#E06A4F] hover:opacity-80 transition">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
               </svg>
             </button>
-            <button className="text-[#3F4B73]">
-              <svg
-                width="24"
-                height="24"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m-9 4v6m4-6v6m-4-6v6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
+            {/* Trash Icon */}
+            <button className="text-[#2B3A67] hover:opacity-80 transition">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
               </svg>
             </button>
+            {/* Search Bar */}
             <div className="relative">
-              <svg
-                className="absolute left-4 top-2.5 text-gray-400"
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input
-                type="text"
-                placeholder="Search"
-                className="pl-12 pr-4 py-2 w-64 rounded-full bg-white shadow-sm outline-none text-sm text-gray-700"
-              />
+              <input type="text" placeholder="Search" className="pl-11 pr-4 py-2 w-[280px] rounded-full bg-white shadow-sm outline-none text-sm text-gray-700 focus:ring-2 focus:ring-blue-100 transition" />
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto flex flex-col gap-6 px-4">
+          {/* Chat Bubbles */}
+          <div className="flex-1 overflow-y-auto flex flex-col gap-8 pr-2">
+            
+            {/* User Message 1 */}
             <div className="flex justify-end items-end gap-3">
               <div className="relative group">
-                {/* Small edit icon (visible on hover or static based on design) */}
-                <div className="absolute -left-8 top-1/2 -translate-y-1/2 text-gray-500">
-                  <svg
-                    width="16"
-                    height="16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                <button className="absolute -left-10 top-1/2 -translate-y-1/2 text-gray-600 opacity-0 group-hover:opacity-50 hover:!opacity-100 transition">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                   </svg>
-                </div>
-                <div className="bg-white p-5 rounded-2xl rounded-br-sm shadow-md text-gray-700 max-w-xl text-[15px]">
+                </button>
+                <div className="bg-white px-6 py-5 rounded-2xl rounded-br-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] text-[#4B5563] max-w-xl text-[15px] font-medium">
                   What are the services provided by EventZen?
                 </div>
               </div>
-              <div className="w-8 h-8 rounded-full bg-orange-200 overflow-hidden shrink-0">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" />
-              </div>
+              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-sm"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=fbd38d" alt="User Avatar" /></div>
             </div>
 
+            {/* Bot Message */}
             <div className="flex justify-start items-end gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-100 overflow-hidden shrink-0 border border-white">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Zen" />
-              </div>
-              <div className="relative">
-                <div className="bg-white p-6 rounded-2xl rounded-bl-sm shadow-md text-gray-700 max-w-2xl text-[15px] border-l-4 border-[#1E2B58]">
-                  <p>Sure, here are the sentences for each point:</p>
-                  <ol className="list-decimal pl-4 mt-2 space-y-1">
-                    <li>
-                      AI Support For Event Planning: Our advanced AI tools
-                      assist planners...
-                    </li>
+              <div className="w-8 h-8 rounded-full bg-teal-100 overflow-hidden shrink-0 shadow-sm border border-white"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=Zen&backgroundColor=b2f5ea" alt="Bot Avatar" /></div>
+              <div className="relative group">
+                <button className="absolute -right-10 top-1/2 -translate-y-1/2 text-gray-600 opacity-0 group-hover:opacity-50 hover:!opacity-100 transition">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+                <div className="bg-white p-6 rounded-2xl rounded-bl-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] text-[#4B5563] max-w-2xl text-[15px] leading-relaxed border-l-4 border-[#1E2B58]">
+                  <p className="mb-2">Sure, here are the sentences for each point:</p>
+                  <ol className="list-decimal pl-4 space-y-1 text-[#6B7280]">
+                    <li><strong className="font-medium text-[#4B5563]">AI Support For Event Planning:</strong> Our advanced AI tools assist planners in organizing seamless events by providing intelligent recommendations and automating routine tasks.</li>
+                    <li><strong className="font-medium text-[#4B5563]">Budget Planning Support:</strong> We offer comprehensive budget planning tools to help you manage your event expenses efficiently and stay within your financial limits.</li>
+                    <li><strong className="font-medium text-[#4B5563]">Virtual Event Support:</strong> Our platform enables you to host engaging virtual events with robust features for live streaming, interactive sessions, and attendee management.</li>
                   </ol>
+                  <p className="mt-2">Would you like any further details or modifications?</p>
                 </div>
               </div>
             </div>
+
+            {/* User Message 2 */}
+            <div className="flex justify-end items-end gap-3">
+               <div className="relative group">
+                <button className="absolute -left-10 top-1/2 -translate-y-1/2 text-gray-600 opacity-0 group-hover:opacity-50 hover:!opacity-100 transition">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+                <div className="bg-white px-6 py-4 rounded-2xl rounded-br-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] text-[#4B5563] max-w-xl text-[15px] font-medium">
+                  Thank You :)
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 shadow-sm"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=fbd38d" alt="User Avatar" /></div>
+            </div>
+
           </div>
 
-          {/* Input for the prompt */}
-          <div className="mt-4 bg-white rounded-2xl p-2 flex items-center shadow-lg">
-            <input
-              type="text"
-              placeholder="Type a new message here"
-              className="flex-1 px-4 py-3 outline-none text-gray-700 bg-transparent"
-            />
-            <div className="flex items-center gap-4 pr-4 text-gray-700">
-              <button>
-                <svg
-                  width="24"
-                  height="24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+          {/* Bottom Input */}
+          <div className="mt-6 bg-white rounded-2xl p-2 flex items-center shadow-lg border border-gray-100">
+            <input type="text" placeholder="Type a new message here" className="flex-1 px-5 py-3 outline-none text-[#4B5563] bg-transparent text-[15px]" />
+            <div className="flex items-center gap-5 pr-4 text-[#4B5563]">
+              {/* Attachment Icon */}
+              <button className="hover:text-black transition">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                 </svg>
               </button>
-              <button>
-                <svg
-                  width="24"
-                  height="24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" />
+              {/* Smiley Icon */}
+              <button className="hover:text-black transition">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                  <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                  <line x1="15" y1="9" x2="15.01" y2="9"></line>
                 </svg>
               </button>
-              <button>
-                <svg
-                  width="24"
-                  height="24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+              {/* Send Icon */}
+              <button className="hover:text-black transition">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
               </button>
             </div>
           </div>
+
         </div>
       </div>
     </div>

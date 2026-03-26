@@ -1,5 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { listPublishedEvents } from "../shared/api/eventClient";
+
+type BackendEvent = {
+  _id: string;
+  title: string;
+  description?: string;
+  image?: string;
+};
+
 
 type EventItem = {
   id: string;
@@ -14,6 +23,23 @@ type EventItem = {
 export default function UpcomingEventsPage() {
   const navigate = useNavigate();
   const [upcomingEvents, setUpcomingEvents] = React.useState<EventItem[]>([]);
+  React.useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const responseData = await listPublishedEvents();
+        const data = responseData.data || [];
+        const mappedEvents: EventItem[] = data.map((ev: BackendEvent, i: number) => ({
+          id: ev._id,
+          title: ev.title,
+          description: ev.description || "",
+          ticketPrice: "Rs. 1,000.00",
+          image: ev.image || `/images/events/event${(i % 6) + 1}.jpg`
+        }));
+        setUpcomingEvents(mappedEvents);
+      } catch (err: any) {}
+    }
+    fetchEvents();
+  }, []);
 
   const onBuy = (eventId: string) => {
     console.log("Selected event:", eventId);

@@ -30,13 +30,32 @@ export default function UpcomingEventsPage() {
         const responseData = await listPublishedEvents();
         // Assume API returns { success: true, data: [...] }
         const data = responseData.data || [];
-        const mappedEvents: EventItem[] = data.map((ev: BackendEvent, i: number) => ({
-          id: ev._id,
-          title: ev.title,
-          description: ev.description || "",
-          ticketPrice: "Rs. 1,000.00", // Fallback or parse from description if available
-          image: ev.image || `/images/events/event${(i % 6) + 1}.jpg`, // Use dummy images cycle
-        }));
+        const mappedEvents: EventItem[] = data.map((ev: BackendEvent, i: number) => {
+          let displayDesc = ev.description || "";
+          let price = "Free";
+          
+          if (displayDesc.includes(" | Capacity: ")) {
+             const parts = displayDesc.split(" | ");
+             displayDesc = parts[0] || ""; // Base description
+             
+             // Parse price
+             const pricePart = parts.find((p: string) => p.startsWith("Price: "));
+             if (pricePart) {
+                 const priceVal = pricePart.replace("Price: ", "").trim();
+                 if (priceVal && priceVal !== "Free" && priceVal !== "0") {
+                   price = `Rs. ${Number(priceVal).toLocaleString("en-LK", {minimumFractionDigits: 2})}`;
+                 }
+             }
+          }
+
+          return {
+            id: ev._id,
+            title: ev.title,
+            description: displayDesc,
+            ticketPrice: price,
+            image: ev.image || `/images/events/event${(i % 6) + 1}.jpg`,
+          };
+        });
         setUpcomingEvents(mappedEvents);
       } catch (err: any) {
         setError(err.message || "Failed to fetch events");

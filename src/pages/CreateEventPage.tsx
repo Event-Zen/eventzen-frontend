@@ -189,9 +189,24 @@ export default function CreateEventPage() {
         e.preventDefault();
 
         // Demo: replace with your real flow (stepper / API)
+        const fullDesc = `${form.description || ''} | Capacity: ${form.capacity || 'N/A'} | Type: ${form.eventType} | Price: ${form.ticketPrice || 'Free'}`;
+        
+        const startDateTime = form.date 
+            ? new Date(`${toYMD(form.date)}T${form.startTime || "00:00"}`)
+            : new Date();
+            
+        const endDateTime = form.date 
+            ? new Date(`${toYMD(form.date)}T${form.endTime || "23:59"}`)
+            : new Date();
+
         const payload = {
-            ...form,
-            date: form.date ? toYMD(form.date) : null,
+            title: form.title,
+            description: fullDesc,
+            startDateTime,
+            endDateTime,
+            locationType: form.eventMode === "virtual" ? "online" : "physical",
+            location: form.location,
+            status: "published"
         };
         console.log("Next payload:", payload);
         // alert("Next (demo). You can route to step-2 or submit to backend.");

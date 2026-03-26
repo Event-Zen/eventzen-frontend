@@ -594,14 +594,15 @@ export default function CreateEventPage() {
                 </div>
             </div>
 
-            {/* Floating AI Support pill (bottom center) */}
-            <button
-                type="button"
-                className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-violet-700 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-violet-800"
-                onClick={() => alert("AI Support (demo)")}
-            >
-                ✦ AI Support
-            </button>
+            <div className="sticky bottom-6 z-50 flex w-full justify-center pointer-events-none pb-6">
+                <button
+                    type="button"
+                    className="pointer-events-auto rounded-full bg-violet-700 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-violet-800"
+                    onClick={() => alert("AI Support (demo)")}
+                >
+                    ✦ AI Support
+                </button>
+            </div>
         </div>
     );
 }

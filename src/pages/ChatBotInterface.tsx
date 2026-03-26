@@ -127,8 +127,49 @@ function ChatBotInterface() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto flex flex-col gap-6 px-4"></div>
+          <div className="flex-1 overflow-y-auto flex flex-col gap-6 px-4">
+            <div className="flex justify-end items-end gap-3">
+              <div className="relative group">
+                {/* Small edit icon (visible on hover or static based on design) */}
+                <div className="absolute -left-8 top-1/2 -translate-y-1/2 text-gray-500">
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                  </svg>
+                </div>
+                <div className="bg-white p-5 rounded-2xl rounded-br-sm shadow-md text-gray-700 max-w-xl text-[15px]">
+                  What are the services provided by EventZen?
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-orange-200 overflow-hidden shrink-0">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" />
+              </div>
+            </div>
 
+            <div className="flex justify-start items-end gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-100 overflow-hidden shrink-0 border border-white">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Zen" />
+              </div>
+              <div className="relative">
+                <div className="bg-white p-6 rounded-2xl rounded-bl-sm shadow-md text-gray-700 max-w-2xl text-[15px] border-l-4 border-[#1E2B58]">
+                  <p>Sure, here are the sentences for each point:</p>
+                  <ol className="list-decimal pl-4 mt-2 space-y-1">
+                    <li>
+                      AI Support For Event Planning: Our advanced AI tools
+                      assist planners...
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Input for the prompt */}
           <div className="mt-4 bg-white rounded-2xl p-2 flex items-center shadow-lg">
             <input
               type="text"

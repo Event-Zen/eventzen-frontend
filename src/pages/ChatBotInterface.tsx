@@ -1,19 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function ChatBotInterface() {
+
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
   return (
     <div className="min-h-screen bg-[#050B1B] flex items-center justify-center p-8 font-sans">
       
       {/* Main Container */}
       <div className="flex w-full max-w-6xl h-[90vh] bg-[#9CA3AF] rounded-[2rem] overflow-hidden border-4 border-white/20 shadow-2xl">
         
-        {/* Left Sidebar (Solid Dark) */}
-        <div className="w-1/3 max-w-[340px] bg-[#0A0F1D] flex flex-col p-6 relative overflow-hidden z-0">
-          
-          <div className="relative z-10 flex flex-col h-full">
-            {/* Hamburger */}
+        {/* Left Sidebar */}
+        <div className={`transition-all duration-300 ease-in-out shrink-0 overflow-hidden bg-[#0A0F1D] relative z-0 ${isSidebarOpen ? 'w-[340px]' : 'w-0'}`}>
+
+          <div className="w-[340px] h-full p-6 flex flex-col relative z-10">
+            {/* Hamburger (Close) */}
             <div className="flex justify-end mb-8">
-              <button className="p-2.5 border border-white/20 rounded-lg text-white hover:bg-white/10 transition">
+              <button 
+                onClick={() => setIsSidebarOpen(false)}
+                className="p-2.5 border border-white/20 rounded-lg text-white hover:bg-white/10 transition"
+                aria-label="Close sidebar"
+              >
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="3" y1="12" x2="21" y2="12"></line>
                   <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -69,34 +76,55 @@ function ChatBotInterface() {
         </div>
 
         {/* Right Main Chat Area */}
-        <div className="flex-1 flex flex-col px-8 py-6 relative">
+        <div className="flex-1 flex flex-col px-8 py-6 relative overflow-hidden">
           
           {/* Header Actions */}
-          <div className="flex justify-end items-center gap-5 mb-6">
-            {/* Alert Icon */}
-            <button className="text-[#E06A4F] hover:opacity-80 transition">
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg>
-            </button>
-            {/* Trash Icon */}
-            <button className="text-[#2B3A67] hover:opacity-80 transition">
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                <line x1="10" y1="11" x2="10" y2="17"></line>
-                <line x1="14" y1="11" x2="14" y2="17"></line>
-              </svg>
-            </button>
-            {/* Search Bar */}
-            <div className="relative">
-              <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="text" placeholder="Search" className="pl-11 pr-4 py-2 w-[280px] rounded-full bg-white shadow-sm outline-none text-sm text-gray-700 focus:ring-2 focus:ring-blue-100 transition" />
+          <div className="flex justify-between items-center mb-6">
+            
+            {/* Left side of header: Hamburger (Only visible when sidebar is closed) */}
+            <div className="flex items-center">
+              {!isSidebarOpen && (
+                <button 
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="p-2 border border-white/40 bg-white/20 rounded-lg text-[#2B3A67] hover:bg-white/40 transition mr-4"
+                  aria-label="Open sidebar"
+                >
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {/* Right side of header: Actions & Search */}
+            <div className="flex items-center gap-5 ml-auto">
+              {/* Alert Icon */}
+              <button className="text-[#E06A4F] hover:opacity-80 transition">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </button>
+              {/* Trash Icon */}
+              <button className="text-[#2B3A67] hover:opacity-80 transition">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
+              {/* Search Bar */}
+              <div className="relative hidden sm:block">
+                <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" placeholder="Search" className="pl-11 pr-4 py-2 w-[280px] rounded-full bg-white shadow-sm outline-none text-sm text-gray-700 focus:ring-2 focus:ring-blue-100 transition" />
+              </div>
             </div>
           </div>
 

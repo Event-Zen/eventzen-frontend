@@ -222,7 +222,7 @@ const ServicesPage: React.FC = () => {
     <div className="w-full px-6 py-6">
       <h1 className="mb-4 text-xl font-bold text-slate-900">Select Services</h1>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_320px]">
         {/* LEFT */}
         <div className="space-y-6">
           {categories.map((cat) => (
@@ -287,7 +287,7 @@ const ServicesPage: React.FC = () => {
         </div>
 
         {/* RIGHT (Budget report) */}
-       <aside className="hidden lg:block lg:sticky lg:top-24 h-fit">
+      <aside className="hidden lg:block lg:self-start lg:sticky lg:top-28 h-fit">
           <div className="rounded-2xl border border-black/10 bg-rose-300 p-4 text-rose-950">
             <div className="mb-3 text-sm font-extrabold">Budget Report</div>
 

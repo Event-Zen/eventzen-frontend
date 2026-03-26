@@ -452,8 +452,8 @@ export default function CreateEventPage() {
 
 
                     {/* Right side for smart insights */}
-                    <div className="hidden lg:block lg:w-[420px] pl-10">
-                        <div className="sticky top-24 space-y-6">
+                    <div className="hidden lg:block lg:w-[420px] lg:self-start lg:sticky lg:top-28 h-fit pl-10">
+                        <div className="space-y-6">
 
                             {/* Smart Insights Card */}
                             <div className="rounded-2xl border bg-white shadow-sm p-6">

@@ -219,13 +219,24 @@ const ServicesPage: React.FC = () => {
     return items;
   }, [categories, selectedByCategory]);
 
-  const otherServices = useMemo(
-    () => [
-      { label: "E-services", value: 15000 },
-      { label: "Cater services", value: 5000 },
-    ],
-    []
-  );
+  const [otherServices, setOtherServices] = useState<{ label: string; value: number }[]>([
+    { label: "E-services", value: 15000 },
+    { label: "Cater services", value: 5000 },
+  ]);
+
+  const updateOtherService = (index: number, field: "label" | "value", val: string) => {
+    setOtherServices((prev) => prev.map((item, i) =>
+      i === index ? { ...item, [field]: field === "value" ? (Number(val) || 0) : val } : item
+    ));
+  };
+
+  const removeOtherService = (index: number) => {
+    setOtherServices((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const addOtherService = () => {
+    setOtherServices((prev) => [...prev, { label: "", value: 0 }]);
+  };
 
   const selectedTotal = useMemo(
     () => selectedItems.reduce((sum, it) => sum + it.price, 0),
@@ -388,17 +399,46 @@ const ServicesPage: React.FC = () => {
             <div className="mb-3 rounded-xl bg-white/40 p-3">
               <div className="mb-2 text-xs font-extrabold">Other Services</div>
 
-              <div className="space-y-1">
-                {otherServices.map((it) => (
+              <div className="space-y-2">
+                {otherServices.map((it, idx) => (
                   <div
-                    key={it.label}
-                    className="flex items-center justify-between gap-3 text-xs"
+                    key={idx}
+                    className="flex items-center gap-2 text-xs"
                   >
-                    <div className="truncate">{it.label}</div>
-                    <div className="font-extrabold">{LKR(it.value)}</div>
+                    <input
+                      type="text"
+                      value={it.label}
+                      placeholder="Service name"
+                      onChange={(e) => updateOtherService(idx, "label", e.target.value)}
+                      className="w-[100px] rounded border border-rose-200 bg-white/60 px-2 py-1 text-xs outline-none focus:border-rose-400"
+                    />
+                    <input
+                      type="number"
+                      value={it.value || ""}
+                      placeholder="0"
+                      min={0}
+                      onChange={(e) => updateOtherService(idx, "value", e.target.value)}
+                      className="w-[80px] rounded border border-rose-200 bg-white/60 px-2 py-1 text-xs font-extrabold outline-none focus:border-rose-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeOtherService(idx)}
+                      className="text-rose-800 hover:text-rose-950 text-sm leading-none"
+                      title="Remove"
+                    >
+                      ×
+                    </button>
                   </div>
                 ))}
               </div>
+
+              <button
+                type="button"
+                onClick={addOtherService}
+                className="mt-2 text-[11px] font-bold text-rose-900 hover:text-rose-950 underline"
+              >
+                + Add service
+              </button>
 
               <div className="my-2 h-px bg-black/15" />
               <div className="flex items-center justify-between text-xs font-extrabold">

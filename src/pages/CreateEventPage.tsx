@@ -190,6 +190,9 @@ export default function CreateEventPage() {
     };
 
     const onCancel = () => {
+        sessionStorage.removeItem("createEventForm");
+        sessionStorage.removeItem("activeEventId");
+        sessionStorage.removeItem("serviceSelections");
         navigate("/");
     };
 

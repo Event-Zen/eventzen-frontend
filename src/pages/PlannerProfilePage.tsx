@@ -16,6 +16,7 @@ type PlannerEvent = {
     description: string;
     progressLabel: string; // "Completed" | "Up Coming"
     progressColor: "green" | "blue";
+    vendorsCount?: number;
 };
 
 function FieldRow({

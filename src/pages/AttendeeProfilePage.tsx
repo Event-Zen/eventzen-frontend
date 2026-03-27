@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import { Pencil } from "lucide-react";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
+import { toast } from "react-hot-toast";
 
 type ProfileForm = {
   name: string;
@@ -77,19 +78,19 @@ export default function AttendeeProfilePage() {
   function handleSave() {
     // TODO: integrate API call (PATCH /profile) etc.
     console.log("Saving profile:", form);
-    alert("Profile saved!");
+    toast.success("Profile saved!");
   }
 
   function handleEditEvent(id: string) {
     // TODO: navigate to edit event page (e.g., /events/:id/edit)
     console.log("Edit event:", id);
-    alert(`Edit event: ${id}`);
+    toast(`Edit event: ${id}`);
   }
 
   function handleCreateEvent() {
     // TODO: navigate to create event page (e.g., /events/create)
     console.log("Create event");
-    alert("Go to Create Event page");
+    toast("Go to Create Event page");
   }
 
   return (
@@ -116,7 +117,7 @@ export default function AttendeeProfilePage() {
               <button
                 type="button"
                 className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm"
-                onClick={() => alert("Avatar edit (optional)")}
+                onClick={() => toast("Avatar edit (optional)")}
                 aria-label="Edit avatar"
               >
                 <Pencil size={12} />

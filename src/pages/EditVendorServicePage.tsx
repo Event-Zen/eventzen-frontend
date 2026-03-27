@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getVendorServiceById, updateVendorService } from "../shared/api/vendorClient";
+import { toast } from "react-hot-toast";
 
 type ServiceForm = {
   serviceName: string;
@@ -54,7 +55,7 @@ export default function EditVendorServicePage() {
         }
       } catch (err: any) {
         console.error("Failed to load service details", err);
-        alert("Failed to load service details");
+        toast.error("Failed to load service details");
         navigate("/vendor-profile");
       } finally {
         setLoading(false);
@@ -87,11 +88,11 @@ export default function EditVendorServicePage() {
         vendorPhone: form.vendorPhone,
         isActive: form.isActive,
       });
-      alert("Service updated successfully.");
+      toast.success("Service updated successfully.");
       navigate("/vendor-profile");
     } catch (err: any) {
       console.error(err);
-      alert(err.response?.data?.message || err.message || "Failed to update service");
+      toast.error(err.response?.data?.message || err.message || "Failed to update service");
     } finally {
       setSubmitting(false);
     }

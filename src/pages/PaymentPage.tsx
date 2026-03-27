@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { updateEvent } from "../shared/api/eventClient";
+import { toast } from "react-hot-toast";
 
 // Load Stripe outside of components to avoid recreating the object
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "", {
@@ -45,7 +46,7 @@ function CheckoutForm({ eventId }: { eventId: string | null }) {
       sessionStorage.removeItem("activeEventId");
       sessionStorage.removeItem("serviceSelections");
 
-      alert(`Success! Payment was securely confirmed by Stripe. \nStripe Output ID: ${paymentIntent.id}`);
+      toast.success(`Success! Payment was securely confirmed by Stripe. \nStripe Output ID: ${paymentIntent.id}`);
       navigate("/planner-profile"); // Redirect to planner profile to see updated status
     }
     setIsProcessing(false);

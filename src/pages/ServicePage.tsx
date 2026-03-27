@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { selectVendorsApi } from "../shared/api/eventClient";
 import { listVendorServices } from "../shared/api/vendorClient";
 import { jsPDF } from "jspdf";
+import { toast } from "react-hot-toast";
 
 type ServiceItem = {
   id: string;
@@ -276,12 +277,12 @@ const ServicesPage: React.FC = () => {
   // Save vendor selections to backend and navigate to payment
   const onFinish = async () => {
     if (!eventId) {
-      alert("No event found. Please create an event first.");
+      toast.error("No event found. Please create an event first.");
       return;
     }
 
     if (selectedItems.length === 0) {
-      alert("Please select at least one service.");
+      toast.error("Please select at least one service.");
       return;
     }
 
@@ -314,7 +315,7 @@ const ServicesPage: React.FC = () => {
       navigate("/payment", { state: { eventId } });
     } catch (err: any) {
       console.error("Failed to save vendor selections", err);
-      alert(err.response?.data?.message || err.message || "Failed to save vendor selections.");
+      toast.error(err.response?.data?.message || err.message || "Failed to save vendor selections.");
     } finally {
       setSaving(false);
     }
@@ -516,7 +517,7 @@ const ServicesPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => alert("AI Support (hook up later)")}
+            onClick={() => toast.success("AI Support (hook up later)")}
             className="rounded-full bg-violet-600 px-4 py-2 text-sm font-bold text-white shadow hover:bg-violet-700"
           >
              ✦ AI Support

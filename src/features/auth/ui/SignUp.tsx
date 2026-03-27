@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRegister } from "../hooks/useRegister"; 
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 type Role = "ATTENDEE" | "VENDOR" | "PLANNER";
 
@@ -15,7 +16,7 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { register, loading, error } = useRegister();
+  const { register } = useRegister();
   const navigate = useNavigate();
 
   async function onSubmit(e: React.FormEvent) {
@@ -46,6 +47,7 @@ export default function Signup() {
         address,
       });
       console.log("REGISTER RESPONSE:", res);
+      toast.success("Account created successfully! Please login.");
       navigate("/login");
     } catch (err: any) {
       const message = err?.response?.data?.message || "Registration failed";

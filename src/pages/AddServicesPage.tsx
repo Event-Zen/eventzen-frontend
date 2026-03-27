@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createVendorService } from "../shared/api/vendorClient";
+import { toast } from "react-hot-toast";
 
 type ServiceForm = {
   serviceName: string;
@@ -66,11 +67,11 @@ export default function AddServicePage() {
         vendorPhone: form.vendorPhone,
         availableDates: [new Date()], // Just defaulting to now for creation
       });
-      alert("Service added successfully.");
+      toast.success("Service added successfully.");
       navigate("/vendor-profile");
     } catch (err: any) {
       console.error(err);
-      alert(err.response?.data?.message || err.message || "Failed to add service");
+      toast.error(err.response?.data?.message || err.message || "Failed to add service");
     } finally {
       setSubmitting(false);
     }

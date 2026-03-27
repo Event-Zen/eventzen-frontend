@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getMyEvents, getEventById } from "../shared/api/eventClient";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
 import GoogleMeetButton from "../components/GoogleMeetButton";
+import { toast } from "react-hot-toast";
 
 type Planner = {
     name: string;
@@ -181,7 +182,7 @@ export default function PlannerProfilePage() {
             navigate("/create-event", { state: { lockedVendors: isPublished } });
         } catch (error) {
             console.error("Failed to fetch event for edit", error);
-            alert("Could not load full event details.");
+            toast.error("Could not load full event details.");
         } finally {
             setLoadingEvents(false);
         }
@@ -262,7 +263,7 @@ export default function PlannerProfilePage() {
                             <button
                                 type="button"
                                 className="rounded-md bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-700"
-                                onClick={() => alert("Saved (demo). Use edit icon to modify.")}
+                                onClick={() => toast.success("Saved (demo). Use edit icon to modify.")}
                             >
                                 Save Change
                             </button>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
+import { toast } from "react-hot-toast";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -33,6 +34,7 @@ export default function Login() {
       localStorage.setItem("user", JSON.stringify(data.user));
       
       window.dispatchEvent(new Event("storage"));
+      toast.success(`Welcome back, ${data.user.name || 'User'}!`);
       navigate("/");
     } catch (err: any) {
       const message = err?.response?.data?.message || "Invalid credentials";

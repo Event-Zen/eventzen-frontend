@@ -14,6 +14,7 @@ import PaymentPage from "./pages/PaymentPage";
 import UpcomingEventsPage from "./pages/UpcomingEventsPage";
 import AttendeeProfilePage from "./pages/AttendeeProfilePage";
 import ChatBotInterface from "./pages/ChatBotInterface";
+import { Toaster } from "react-hot-toast";
 
 import { RoleRoute } from "./features/auth/ui/RoleRoute";
 import { ProtectedRoute } from "./features/auth/ui/ProtectedRoute";
@@ -21,6 +22,7 @@ import { ProtectedRoute } from "./features/auth/ui/ProtectedRoute";
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
         {/* Public */}
         <Route

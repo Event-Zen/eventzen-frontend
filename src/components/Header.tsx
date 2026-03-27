@@ -86,9 +86,11 @@ const Header = () => {
                 Dashboard
               </Link> */}
 
-              <Link to={profilePath(user.role)} className="hover:text-blue-500 transition">
-                Profile
-              </Link>
+              {user.role !== "ADMIN" && (
+                <Link to={profilePath(user.role)} className="hover:text-blue-500 transition">
+                  Profile
+                </Link>
+              )}
 
               <button
                 onClick={onLogout}

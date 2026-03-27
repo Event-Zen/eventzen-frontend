@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
+import GoogleCalendarButton from "../components/GoogleCalendarButton";
 
 type Vendor = {
   name: string;
@@ -194,6 +195,15 @@ export default function VendorProfilePage() {
                   </button>
                 </div>
               )}
+            </div>
+
+            {/* Availability – Google Calendar */}
+            <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50/60 p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Availability</h3>
+              <p className="text-xs text-gray-600 mb-3">
+                Open Google Calendar to set your available dates and times for your services.
+              </p>
+              <GoogleCalendarButton />
             </div>
           </div>
 

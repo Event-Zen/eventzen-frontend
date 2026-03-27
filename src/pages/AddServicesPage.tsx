@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GoogleCalendarButton from "../components/GoogleCalendarButton";
 import { createVendorService } from "../shared/api/vendorClient";
 
 type ServiceForm = {
@@ -174,15 +173,6 @@ export default function AddServicePage() {
               placeholder="e.g. 077 123 4567"
             />
           </Field>
-
-          {/* Availability – Google Calendar */}
-          <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">Availability</h3>
-            <p className="text-xs text-gray-600 mb-3">
-              Open Google Calendar to set your available dates and times for this service.
-            </p>
-            <GoogleCalendarButton />
-          </div>
 
           <div className="pt-2 flex gap-3">
             <button

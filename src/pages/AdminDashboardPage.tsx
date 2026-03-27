@@ -13,6 +13,7 @@ import { listUsersAdmin, updateUserStatusAdmin } from "../shared/api/userClient"
 import { listServicesAdmin, updateServiceStatusAdmin } from "../shared/api/vendorClient";
 import { listEventsAdmin } from "../shared/api/eventClient";
 import { toast } from "react-hot-toast";
+import { seedSampleData } from "../shared/utils/seedData";
 
 // Types
 type Tab = "overview" | "users" | "services" | "events";
@@ -129,6 +130,17 @@ export default function AdminDashboardPage() {
     toast.success(`${action} initiated (Demo Mode)`);
   };
 
+  const handleSeedData = async () => {
+    try {
+      toast.loading("Seeding sample data...", { id: "seed" });
+      await seedSampleData();
+      toast.success("Sample data seeded! Reloading...", { id: "seed" });
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (error) {
+      toast.error("Seeding failed. Check console for details.", { id: "seed" });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -208,7 +220,13 @@ export default function AdminDashboardPage() {
           </div>
         </header>
 
-        {activeTab === "overview" && <Overview stats={stats} onAction={handleQuickAction} />}
+        {activeTab === "overview" && (
+          <Overview 
+            stats={stats} 
+            onAction={handleQuickAction} 
+            onSeed={handleSeedData} 
+          />
+        )}
         {activeTab === "users" && <UserManagement users={filteredUsers} onToggleStatus={handleUserStatus} />}
         {activeTab === "services" && <ServiceModeration services={services} onToggleService={handleServiceStatus} />}
         {activeTab === "events" && <EventMonitoring events={events} />}
@@ -218,7 +236,10 @@ export default function AdminDashboardPage() {
 }
 
 // Sub-components
-function Overview({ stats, onAction }: { stats: any, onAction: (a: string) => void }) {
+function Overview({ stats, onAction, onSeed }: { stats: any, onAction: (a: string) => void, onSeed: () => void }) {
+  // Expose seed function to global for the ActionButton hack
+  (window as any).handleSeed = onSeed;
+  
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -259,6 +280,7 @@ function Overview({ stats, onAction }: { stats: any, onAction: (a: string) => vo
            <div className="space-y-2">
               <ActionButton label="Generate Monthly Report" color="blue" onClick={() => onAction("Monthly Report")} />
               <ActionButton label="Send System Broadcast" color="orange" onClick={() => onAction("Broadcast message")} />
+              <ActionButton label="Seed Sample Data" color="emerald" onClick={() => (window as any).handleSeed()} />
               <ActionButton label="Maintenance Mode" color="rose" onClick={() => onAction("Maintenance toggle")} />
               <div className="pt-4 mt-4 border-t border-gray-50">
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-3">System Health</p>
@@ -279,7 +301,8 @@ function ActionButton({ label, color, onClick }: { label: string, color: string,
   const colors: any = {
     blue: "text-blue-600 hover:bg-blue-50",
     orange: "text-orange-600 hover:bg-orange-50",
-    rose: "text-rose-600 hover:bg-rose-50"
+    rose: "text-rose-600 hover:bg-rose-50",
+    emerald: "text-emerald-600 hover:bg-emerald-50"
   };
   return (
     <button onClick={onClick} className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition ${colors[color]}`}>

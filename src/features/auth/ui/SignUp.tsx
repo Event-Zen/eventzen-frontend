@@ -3,7 +3,7 @@ import { useRegister } from "../hooks/useRegister";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-type Role = "ATTENDEE" | "VENDOR" | "PLANNER";
+type Role = "ATTENDEE" | "VENDOR" | "PLANNER" | "ADMIN";
 
 export default function Signup() {
   const [role, setRole] = useState<Role>("ATTENDEE");
@@ -102,10 +102,11 @@ export default function Signup() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Account type
           </label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <RoleButton value="ATTENDEE" role={role} setRole={setRole} />
             <RoleButton value="VENDOR" role={role} setRole={setRole} />
             <RoleButton value="PLANNER" role={role} setRole={setRole} />
+            <RoleButton value="ADMIN" role={role} setRole={setRole} />
           </div>
         </div>
 

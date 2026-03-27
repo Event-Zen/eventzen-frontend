@@ -38,3 +38,13 @@ export const updateVendorService = async (id: string, payload: any) => {
   const response = await vendorApi.put(`/${id}`, payload);
   return response.data;
 };
+
+export const listServicesAdmin = async () => {
+  const response = await vendorApi.get("/admin");
+  return response.data;
+};
+
+export const updateServiceStatusAdmin = async (id: string, payload: { isActive?: boolean; status?: string }) => {
+  const response = await vendorApi.patch(`/${id}/status`, payload);
+  return response.data;
+};

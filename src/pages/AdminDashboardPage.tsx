@@ -1,67 +1,124 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { 
   Users, 
   LayoutDashboard, 
   ShieldCheck, 
   Calendar, 
-  TrendingUp, 
   Search,
   CheckCircle,
   XCircle,
-  MoreVertical
+  Loader2
 } from "lucide-react";
+import { listUsersAdmin, updateUserStatusAdmin } from "../shared/api/userClient";
+import { listServicesAdmin, updateServiceStatusAdmin } from "../shared/api/vendorClient";
+import { listEventsAdmin } from "../shared/api/eventClient";
+import { toast } from "react-hot-toast";
 
 // Types
 type Tab = "overview" | "users" | "services" | "events";
 
 type UserRecord = {
-  id: string;
+  id?: string;
+  _id: string;
   name: string;
   email: string;
-  role: "ATTENDEE" | "VENDOR" | "PLANNER";
-  status: "active" | "blocked";
+  role: "ATTENDEE" | "VENDOR" | "PLANNER" | "ADMIN";
+  status: string;
   createdAt: string;
 };
 
 type ServiceModeration = {
-  id: string;
+  _id: string;
   vendorName: string;
   serviceName: string;
   category: string;
   price: number;
-  status: "pending" | "approved" | "rejected";
+  isActive: boolean;
+  status?: string;
 };
 
-// Mock Data
-const MOCK_USERS: UserRecord[] = [
-  { id: "u1", name: "Dhanuka Navod", email: "dhanuka@gmail.com", role: "VENDOR", status: "active", createdAt: "2024-03-20" },
-  { id: "u2", name: "Kasun Madushan", email: "kasun@gmail.com", role: "PLANNER", status: "active", createdAt: "2024-03-21" },
-  { id: "u3", name: "Janith Perera", email: "janith@gmail.com", role: "ATTENDEE", status: "blocked", createdAt: "2024-03-22" },
-  { id: "u4", name: "Saman Kumara", email: "saman@gmail.com", role: "VENDOR", status: "active", createdAt: "2024-03-23" },
-];
-
-const MOCK_SERVICES: ServiceModeration[] = [
-  { id: "s1", vendorName: "Dhanuka Navod", serviceName: "DJ & Sound System", category: "music", price: 25000, status: "pending" },
-  { id: "s2", vendorName: "Saman Kumara", serviceName: "Elegant Floral Decor", category: "decor", price: 45000, status: "pending" },
-  { id: "s3", vendorName: "Dhanuka Navod", serviceName: "Stage Lighting", category: "light", price: 15000, status: "approved" },
-];
+type EventRecord = {
+  _id: string;
+  title: string;
+  status: string;
+  startDateTime: string;
+  organizerId: string;
+};
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const [users, setUsers] = useState<UserRecord[]>([]);
+  const [services, setServices] = useState<ServiceModeration[]>([]);
+  const [events, setEvents] = useState<EventRecord[]>([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [usersRes, servicesRes, eventsRes] = await Promise.all([
+        listUsersAdmin(),
+        listServicesAdmin(),
+        listEventsAdmin()
+      ]);
+      
+      setUsers(usersRes);
+      setServices(servicesRes.data || []);
+      setEvents(eventsRes.data || []);
+    } catch (error: any) {
+      toast.error("Failed to fetch dashboard data");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUserStatus = async (userId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "SUSPENDED" ? "ACTIVE" : "SUSPENDED";
+    try {
+      await updateUserStatusAdmin(userId, newStatus);
+      setUsers(users.map(u => u._id === userId ? { ...u, status: newStatus } : u));
+      toast.success(`User ${newStatus === "ACTIVE" ? "unblocked" : "blocked"} successfully`);
+    } catch (error) {
+      toast.error("Failed to update user status");
+    }
+  };
+
+  const handleServiceStatus = async (serviceId: string, isActive: boolean) => {
+    try {
+      await updateServiceStatusAdmin(serviceId, { isActive });
+      setServices(services.map(s => s._id === serviceId ? { ...s, isActive } : s));
+      toast.success(`Service ${isActive ? "approved" : "rejected"} successfully`);
+    } catch (error) {
+      toast.error("Failed to update service status");
+    }
+  };
 
   const filteredUsers = useMemo(() => 
-    MOCK_USERS.filter(u => 
+    users.filter(u => 
       u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
       u.email.toLowerCase().includes(searchTerm.toLowerCase())
-    ), [searchTerm]);
+    ), [searchTerm, users]);
 
   const stats = {
-    totalUsers: MOCK_USERS.length,
-    activeEvents: 12,
-    pendingServices: MOCK_SERVICES.filter(s => s.status === "pending").length,
-    revenue: "Rs. 1.2M",
+    totalUsers: users.length,
+    activeEvents: events.filter(e => e.status === "published").length,
+    pendingServices: services.filter(s => !s.isActive).length,
+    revenue: "Rs. 1.2M", // Placeholder for revenue logic
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="animate-spin text-blue-500" size={48} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -131,22 +188,13 @@ export default function AdminDashboardPage() {
                 className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-64 text-sm"
               />
             </div>
-            <button className="h-10 w-10 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-white transition shadow-sm">
-              <TrendingUp size={18} className="text-gray-600" />
-            </button>
           </div>
         </header>
 
         {activeTab === "overview" && <Overview stats={stats} />}
-        {activeTab === "users" && <UserManagement users={filteredUsers} />}
-        {activeTab === "services" && <ServiceModeration services={MOCK_SERVICES} />}
-        {activeTab === "events" && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-            <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900">Event Monitoring</h3>
-            <p className="text-gray-500 max-w-xs mx-auto mt-2">Global event tracking and logs will be displayed here in the next update.</p>
-          </div>
-        )}
+        {activeTab === "users" && <UserManagement users={filteredUsers} onToggleStatus={handleUserStatus} />}
+        {activeTab === "services" && <ServiceModeration services={services} onToggleService={handleServiceStatus} />}
+        {activeTab === "events" && <EventMonitoring events={events} />}
       </main>
     </div>
   );
@@ -156,13 +204,13 @@ export default function AdminDashboardPage() {
 function Overview({ stats }: { stats: any }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <StatCard label="Total Platform Users" value={stats.totalUsers} sub="+12% from last month" color="blue" />
-      <StatCard label="Active Global Events" value={stats.activeEvents} sub="Running currently" color="orange" />
+      <StatCard label="Total Platform Users" value={stats.totalUsers} sub="+New registrations" color="blue" />
+      <StatCard label="Active Global Events" value={stats.activeEvents} sub="Published events" color="orange" />
       <StatCard label="Pending Moderation" value={stats.pendingServices} sub="Vendor services" color="violet" />
       <StatCard label="Platform Revenue" value={stats.revenue} sub="Estimated commission" color="emerald" />
       
       <div className="md:col-span-2 lg:col-span-3 bg-white rounded-2xl border border-gray-200 p-6 h-64 flex items-center justify-center border-dashed">
-         <p className="text-gray-400 font-medium">Platform activity chart placeholder</p>
+         <p className="text-gray-400 font-medium">Platform activity chart placeholder (Real-time data enabled)</p>
       </div>
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
          <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
@@ -176,7 +224,7 @@ function Overview({ stats }: { stats: any }) {
   );
 }
 
-function UserManagement({ users }: { users: UserRecord[] }) {
+function UserManagement({ users, onToggleStatus }: { users: UserRecord[], onToggleStatus: (id: string, s: string) => void }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
       <table className="w-full text-left">
@@ -191,7 +239,7 @@ function UserManagement({ users }: { users: UserRecord[] }) {
         </thead>
         <tbody className="divide-y divide-gray-100">
           {users.map(u => (
-            <tr key={u.id} className="hover:bg-gray-50 transition-colors group">
+            <tr key={u._id} className="hover:bg-gray-50 transition-colors group">
               <td className="px-6 py-4 flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-400">{u.name.charAt(0)}</div>
                 <div>
@@ -208,15 +256,22 @@ function UserManagement({ users }: { users: UserRecord[] }) {
                 </span>
               </td>
               <td className="px-6 py-4">
-                 <span className={`flex items-center gap-1.5 text-sm ${u.status === 'active' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                    <div className={`h-1.5 w-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-600' : 'bg-rose-600'}`}></div>
+                 <span className={`flex items-center gap-1.5 text-sm ${u.status === 'ACTIVE' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    <div className={`h-1.5 w-1.5 rounded-full ${u.status === 'ACTIVE' ? 'bg-emerald-600' : 'bg-rose-600'}`}></div>
                     {u.status}
                  </span>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-500">{u.createdAt}</td>
+              <td className="px-6 py-4 text-sm text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</td>
               <td className="px-6 py-4">
-                 <button className="h-8 w-8 hover:bg-white rounded-lg flex items-center justify-center border border-transparent hover:border-gray-200 transition">
-                    <MoreVertical size={16} className="text-gray-400" />
+                 <button 
+                  onClick={() => onToggleStatus(u._id, u.status)}
+                  className={`text-xs font-bold px-3 py-1 rounded-lg border transition ${
+                    u.status === 'ACTIVE' 
+                      ? 'border-rose-200 text-rose-600 hover:bg-rose-50' 
+                      : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'
+                  }`}
+                 >
+                    {u.status === 'ACTIVE' ? 'Block' : 'Unblock'}
                  </button>
               </td>
             </tr>
@@ -227,11 +282,11 @@ function UserManagement({ users }: { users: UserRecord[] }) {
   );
 }
 
-function ServiceModeration({ services }: { services: ServiceModeration[] }) {
+function ServiceModeration({ services, onToggleService }: { services: ServiceModeration[], onToggleService: (id: string, active: boolean) => void }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
        {services.map(s => (
-         <div key={s.id} className="bg-white rounded-2xl border border-gray-200 p-6 flex items-start justify-between shadow-sm">
+         <div key={s._id} className="bg-white rounded-2xl border border-gray-200 p-6 flex items-start justify-between shadow-sm">
             <div className="flex gap-4">
                <div className="h-12 w-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center">
                   <LayoutDashboard className="text-slate-400" size={24} />
@@ -245,21 +300,64 @@ function ServiceModeration({ services }: { services: ServiceModeration[] }) {
             
             <div className="flex flex-col items-end gap-3">
                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                  s.status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 
-                  s.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
+                  s.isActive ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'
                }`}>
-                 {s.status}
+                 {s.isActive ? 'Active' : 'Pending'}
                </span>
                
-               {s.status === 'pending' && (
-                 <div className="flex gap-2">
-                    <button className="h-8 w-8 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center hover:bg-rose-100 transition border border-rose-100"><XCircle size={18} /></button>
-                    <button className="h-8 w-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center hover:bg-emerald-100 transition border border-emerald-100"><CheckCircle size={18} /></button>
-                 </div>
-               )}
+               <div className="flex gap-2">
+                  {s.isActive ? (
+                    <button 
+                      onClick={() => onToggleService(s._id, false)}
+                      className="h-8 w-8 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center hover:bg-rose-100 transition border border-rose-100"
+                    >
+                      <XCircle size={18} />
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => onToggleService(s._id, true)}
+                      className="h-8 w-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center hover:bg-emerald-100 transition border border-emerald-100"
+                    >
+                      <CheckCircle size={18} />
+                    </button>
+                  )}
+               </div>
             </div>
          </div>
        ))}
+    </div>
+  );
+}
+
+function EventMonitoring({ events }: { events: EventRecord[] }) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <table className="w-full text-left">
+        <thead className="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px] font-bold tracking-wider">
+          <tr>
+            <th className="px-6 py-4 font-bold">Event Title</th>
+            <th className="px-6 py-4 font-bold">Status</th>
+            <th className="px-6 py-4 font-bold">Start Date</th>
+            <th className="px-6 py-4 font-bold">Organizer ID</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {events.map(e => (
+            <tr key={e._id} className="hover:bg-gray-50 transition-colors">
+              <td className="px-6 py-4 font-bold text-gray-900">{e.title}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${
+                  e.status === "published" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-gray-50 text-gray-700 border border-gray-100"
+                }`}>
+                  {e.status}
+                </span>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-500">{new Date(e.startDateTime).toLocaleString()}</td>
+              <td className="px-6 py-4 text-xs font-mono text-gray-400">{e.organizerId}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

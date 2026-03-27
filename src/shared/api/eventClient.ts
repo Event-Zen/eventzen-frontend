@@ -43,3 +43,8 @@ export const getEventById = async (id: string) => {
   const response = await eventApi.get(`/${id}`);
   return response.data;
 };
+
+export const listEventsAdmin = async () => {
+  const response = await eventApi.get("/admin");
+  return response.data;
+};

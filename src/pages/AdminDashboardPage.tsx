@@ -73,9 +73,9 @@ export default function AdminDashboardPage() {
         listEventsAdmin()
       ]);
       
-      setUsers(usersRes);
-      setServices(servicesRes.data || []);
-      setEvents(eventsRes.data || []);
+      setUsers(Array.isArray(usersRes) ? usersRes : []);
+      setServices(Array.isArray(servicesRes?.data) ? servicesRes.data : []);
+      setEvents(Array.isArray(eventsRes?.data) ? eventsRes.data : []);
     } catch (error: any) {
       toast.error("Failed to fetch dashboard data");
       console.error(error);
@@ -105,16 +105,23 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const filteredUsers = useMemo(() => 
-    users.filter(u => 
-      u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      u.email.toLowerCase().includes(searchTerm.toLowerCase())
-    ), [searchTerm, users]);
+  const filteredUsers = useMemo(() => {
+    const safeUsers = Array.isArray(users) ? users : [];
+    if (!searchTerm) return safeUsers;
+    return safeUsers.filter(u => 
+      u?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u?.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [users, searchTerm]);
 
   const stats = useMemo(() => {
-    const revenue = events.reduce((sum, e) => sum + (e.budget?.platformFee || 0), 0);
-    const activeU = users.filter(u => u.status === "ACTIVE").length;
-    const suspendedU = users.filter(u => u.status === "SUSPENDED").length;
+    const safeUsers = Array.isArray(users) ? users : [];
+    const safeServices = Array.isArray(services) ? services : [];
+    const safeEvents = Array.isArray(events) ? events : [];
+
+    const revenue = safeEvents.reduce((sum, e) => sum + (e.budget?.platformFee || 0), 0);
+    const activeU = safeUsers.filter(u => u.status === "ACTIVE").length;
+    const suspendedU = safeUsers.filter(u => u.status === "SUSPENDED").length;
 
     return {
       totalUsers: users.length,

@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pencil } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
+import { getMyVendorServices } from "../shared/api/vendorClient";
 
 type Vendor = {
   name: string;
@@ -61,22 +62,48 @@ export default function VendorProfilePage() {
       location: "Dehigahalanda, Ambalantota",
       avatarUrl: "",
     }),
-    [],
+    []
   );
+
+  const navigate = useNavigate();
 
   const [vendor, setVendor] = useState<Vendor>(initialVendor);
   const [draft, setDraft] = useState<Vendor>(initialVendor);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [services] = useState<VendorService[]>([
-    {
-      id: "1",
-      title: "Music",
-      description:
-        "High Quality sound for any type of event for a reasonable price !",
-      price: "Rs. 5,000 only",
-    },
-  ]);
+  const [services, setServices] = useState<VendorService[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await getMyVendorServices();
+        console.log("Fetched my services:", res);
+
+        let dataArray = [];
+        if (res && res.success && Array.isArray(res.data)) {
+          dataArray = res.data;
+        } else if (Array.isArray(res)) {
+          dataArray = res;
+        } else if (res && Array.isArray(res.data)) {
+          dataArray = res.data;
+        }
+
+        const formatted = dataArray.map((s: any) => ({
+          id: s._id || s.id,
+          title: s.serviceName || "Untitled Service",
+          description: s.description || "No description provided.",
+          price: s.price != null ? `Rs. ${Number(s.price).toLocaleString("en-LK")}` : "Price not set",
+        }));
+        setServices(formatted);
+      } catch (err) {
+        console.error("Failed to load vendor services", err);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   const startEdit = () => {
     setDraft(vendor);
@@ -94,7 +121,7 @@ export default function VendorProfilePage() {
   };
 
   const onEditService = (id: string) => {
-    alert(`Edit service : ${id}`);
+    navigate(`/vendor/edit-service/${id}`);
   };
 
   // If no avatar, Showing Vender name initials
@@ -213,7 +240,11 @@ export default function VendorProfilePage() {
             </h2>
 
             <div className="mt-6 space-y-4">
-              {services.map((s) => (
+              {loadingServices ? (
+                <div className="text-sm text-slate-500 text-center py-4">Loading services...</div>
+              ) : services.length === 0 ? (
+                <div className="text-sm text-slate-500 text-center py-4">No services added yet.</div>
+              ) : services.map((s) => (
                 <div
                   key={s.id}
                   className="relative rounded-xl bg-slate-200 px-5 py-4 text-slate-900"

@@ -28,3 +28,13 @@ export const getMyVendorServices = async () => {
   const response = await vendorApi.get("/me");
   return response.data;
 };
+
+export const getVendorServiceById = async (id: string) => {
+  const response = await vendorApi.get(`/${id}`);
+  return response.data;
+};
+
+export const updateVendorService = async (id: string, payload: any) => {
+  const response = await vendorApi.put(`/${id}`, payload);
+  return response.data;
+};

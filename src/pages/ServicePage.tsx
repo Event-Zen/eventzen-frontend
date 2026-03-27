@@ -39,9 +39,19 @@ const ServicesPage: React.FC = () => {
     const fetchServices = async () => {
       try {
         const res = await listVendorServices();
-        if (res && res.data) {
+        
+        let dataArray = [];
+        if (res && res.success && Array.isArray(res.data)) {
+          dataArray = res.data;
+        } else if (Array.isArray(res)) {
+          dataArray = res;
+        } else if (res && Array.isArray(res.data)) {
+          dataArray = res.data;
+        }
+
+        if (dataArray) {
           const grouped: Record<string, ServiceItem[]> = {};
-          res.data.forEach((srv: any) => {
+          dataArray.forEach((srv: any) => {
             if (!grouped[srv.category]) {
               grouped[srv.category] = [];
             }

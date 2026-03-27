@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
 import AddServicePage from "./pages/AddServicesPage";
+import EditVendorServicePage from "./pages/EditVendorServicePage";
 import ServicePage from "./pages/ServicePage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import SignUp from "./features/auth/ui/SignUp";
@@ -108,6 +109,17 @@ function App() {
             <RoleRoute allow={["VENDOR"]}>
               <MainLayout>
                 <AddServicePage />
+              </MainLayout>
+            </RoleRoute>
+          }
+        />
+
+        <Route
+          path="/vendor/edit-service/:id"
+          element={
+            <RoleRoute allow={["VENDOR"]}>
+              <MainLayout>
+                <EditVendorServicePage />
               </MainLayout>
             </RoleRoute>
           }

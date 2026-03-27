@@ -484,40 +484,41 @@ const ServicesPage: React.FC = () => {
         </div>
 
         {/* RIGHT (Budget report) */}
-      <aside className="hidden lg:block lg:self-start lg:sticky lg:top-28 h-fit">
-          <div className="rounded-2xl border border-black/10 bg-rose-300 p-4 text-rose-950">
-            <div className="mb-3 text-sm font-extrabold">Budget Report</div>
+        <aside className="hidden lg:block lg:self-start lg:sticky lg:top-28 h-fit">
+          <div className="rounded-xl bg-white shadow border border-gray-200 p-5 sm:p-6">
+            <h3 className="text-lg font-bold text-gray-900">Budget Report</h3>
+            <p className="mt-1 text-xs text-gray-600">Review selected and additional costs.</p>
 
-            <div className="mb-3 rounded-xl bg-white/40 p-3">
-              <div className="mb-2 text-xs font-extrabold">
+            <div className="mt-4 mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
+              <div className="mb-2 text-xs font-semibold text-gray-800">
                 Selected Services
               </div>
 
               {selectedItems.length === 0 ? (
-                <div className="text-xs opacity-80">No services selected.</div>
+                <div className="text-xs text-gray-500">No services selected.</div>
               ) : (
                 <div className="space-y-1">
                   {selectedItems.map((it) => (
                     <div
                       key={it.id}
-                      className="flex items-center justify-between gap-3 text-xs"
+                      className="flex items-center justify-between gap-3 text-xs text-gray-700"
                     >
                       <div className="truncate">{it.name}</div>
-                      <div className="font-extrabold">{LKR(it.price)}</div>
+                      <div className="font-semibold text-gray-900">{LKR(it.price)}</div>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div className="my-2 h-px bg-black/15" />
-              <div className="flex items-center justify-between text-xs font-extrabold">
+              <div className="my-2 h-px bg-gray-200" />
+              <div className="flex items-center justify-between text-xs font-semibold text-gray-800">
                 <div>Total</div>
-                <div>{LKR(selectedTotal)}</div>
+                <div className="text-gray-900">{LKR(selectedTotal)}</div>
               </div>
             </div>
 
-            <div className="mb-3 rounded-xl bg-white/40 p-3">
-              <div className="mb-2 text-xs font-extrabold">Other Services</div>
+            <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
+              <div className="mb-2 text-xs font-semibold text-gray-800">Other Services</div>
 
               <div className="space-y-2">
                 {otherServices.map((it, idx) => (
@@ -530,7 +531,7 @@ const ServicesPage: React.FC = () => {
                       value={it.label}
                       placeholder="Service name"
                       onChange={(e) => updateOtherService(idx, "label", e.target.value)}
-                      className="w-[100px] rounded border border-rose-200 bg-white/60 px-2 py-1 text-xs outline-none focus:border-rose-400"
+                      className="w-[100px] rounded border border-gray-300 bg-white px-2 py-1 text-xs outline-none focus:border-blue-500"
                     />
                     <input
                       type="number"
@@ -538,12 +539,12 @@ const ServicesPage: React.FC = () => {
                       placeholder="0"
                       min={0}
                       onChange={(e) => updateOtherService(idx, "value", e.target.value)}
-                      className="w-[80px] rounded border border-rose-200 bg-white/60 px-2 py-1 text-xs font-extrabold outline-none focus:border-rose-400"
+                      className="w-[80px] rounded border border-gray-300 bg-white px-2 py-1 text-xs font-semibold outline-none focus:border-blue-500"
                     />
                     <button
                       type="button"
                       onClick={() => removeOtherService(idx)}
-                      className="text-rose-800 hover:text-rose-950 text-sm leading-none"
+                      className="text-gray-500 hover:text-red-600 text-sm leading-none"
                       title="Remove"
                     >
                       ×
@@ -555,21 +556,21 @@ const ServicesPage: React.FC = () => {
               <button
                 type="button"
                 onClick={addOtherService}
-                className="mt-2 text-[11px] font-bold text-rose-900 hover:text-rose-950 underline"
+                className="mt-2 text-[11px] font-semibold text-blue-600 hover:text-blue-700 underline"
               >
                 + Add service
               </button>
 
-              <div className="my-2 h-px bg-black/15" />
-              <div className="flex items-center justify-between text-xs font-extrabold">
+              <div className="my-2 h-px bg-gray-200" />
+              <div className="flex items-center justify-between text-xs font-semibold text-gray-800">
                 <div>Total</div>
-                <div>{LKR(otherTotal)}</div>
+                <div className="text-gray-900">{LKR(otherTotal)}</div>
               </div>
             </div>
 
-            <div className="my-3 h-0.5 bg-black/20" />
+            <div className="my-3 h-px bg-gray-300" />
 
-            <div className="flex items-center justify-between text-[13px] font-black">
+            <div className="flex items-center justify-between rounded-lg bg-blue-50 border border-blue-100 px-3 py-2 text-[13px] font-bold text-gray-900">
               <div>TOTAL</div>
               <div>{LKR(grandTotal)}</div>
             </div>
@@ -577,9 +578,9 @@ const ServicesPage: React.FC = () => {
             <button
               type="button"
               onClick={downloadBudgetReport}
-              className="mt-4 w-full rounded-lg bg-rose-900 py-2 text-xs font-bold text-white hover:bg-rose-950 transition-colors"
+              className="mt-4 w-full rounded-lg bg-blue-600 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 transition"
             >
-              ⬇ Download Report
+              Download Report
             </button>
           </div>
         </aside>

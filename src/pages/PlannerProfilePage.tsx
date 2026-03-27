@@ -185,7 +185,7 @@ export default function PlannerProfilePage() {
         <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-100 px-4 py-10">
             <div className="grid w-full max-w-6xl gap-12 lg:grid-cols-2">
                 {/* LEFT CARD - Planner Details */}
-                <div className="rounded-2xl bg-white p-8 shadow-sm">
+                <div className="rounded-2xl bg-white p-8 pb-0 shadow-sm">
                     {/* Header row */}
                     <div className="relative flex items-center justify-center pb-6">
                         <div className="flex items-center gap-4">
@@ -277,9 +277,13 @@ export default function PlannerProfilePage() {
                     </div>
 
                     {/* Google Calendar & Google Meet */}
-                    <div className="flex gap-3 pt-4">
-                        <GoogleCalendarButton />
-                        <GoogleMeetButton />
+                    <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4 pb-8">
+                        <h3 className="mb-2 text-sm font-medium text-slate-900">Integration Tools</h3>
+                        <p className="mb-4 text-xs text-slate-600">Sync your events and schedule video meetings directly.</p>
+                        <div className="flex gap-3">
+                            <GoogleCalendarButton />
+                            <GoogleMeetButton />
+                        </div>
                     </div>
                 </div>
 

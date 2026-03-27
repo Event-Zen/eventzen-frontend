@@ -41,6 +41,7 @@ const HomeCarousel = () => {
 
   const isAttendee = user?.role === "ATTENDEE";
   const isPlanner = user?.role === "PLANNER";
+  const isVendor = user?.role === "VENDOR";
 
   return (
     <section className="w-full">
@@ -95,6 +96,14 @@ const HomeCarousel = () => {
                         className="bg-white/90 hover:bg-white text-black px-6 py-3 rounded-full font-semibold transition inline-block"
                       >
                         Create Event
+                      </Link>
+                    )}
+                    {isVendor && (
+                      <Link
+                        to="/vendor/add-service"
+                        className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-semibold transition inline-block"
+                      >
+                        Add Service
                       </Link>
                     )}
                   </div>

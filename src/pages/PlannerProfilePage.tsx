@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import GoogleCalendarButton from "../components/GoogleCalendarButton";
+import GoogleMeetButton from "../components/GoogleMeetButton";
 
 type Planner = {
     name: string;
@@ -206,6 +208,12 @@ export default function PlannerProfilePage() {
                                 </button>
                             </div>
                         )}
+                    </div>
+
+                    {/* Google Calendar & Google Meet */}
+                    <div className="flex gap-3 pt-4">
+                        <GoogleCalendarButton />
+                        <GoogleMeetButton />
                     </div>
                 </div>
 

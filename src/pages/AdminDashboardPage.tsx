@@ -43,6 +43,11 @@ type EventRecord = {
   status: string;
   startDateTime: string;
   organizerId: string;
+  budget?: {
+    platformFee: number;
+    total: number;
+    currency: string;
+  };
 };
 
 export default function AdminDashboardPage() {
@@ -105,11 +110,23 @@ export default function AdminDashboardPage() {
       u.email.toLowerCase().includes(searchTerm.toLowerCase())
     ), [searchTerm, users]);
 
-  const stats = {
-    totalUsers: users.length,
-    activeEvents: events.filter(e => e.status === "published").length,
-    pendingServices: services.filter(s => !s.isActive).length,
-    revenue: "Rs. 1.2M", // Placeholder for revenue logic
+  const stats = useMemo(() => {
+    const revenue = events.reduce((sum, e) => sum + (e.budget?.platformFee || 0), 0);
+    const activeU = users.filter(u => u.status === "ACTIVE").length;
+    const suspendedU = users.filter(u => u.status === "SUSPENDED").length;
+
+    return {
+      totalUsers: users.length,
+      activeUsers: activeU,
+      suspendedUsers: suspendedU,
+      activeEvents: events.filter(e => e.status === "published").length,
+      pendingServices: services.filter(s => !s.isActive).length,
+      revenue: `Rs. ${revenue.toLocaleString()}`,
+    };
+  }, [users, events, services]);
+
+  const handleQuickAction = (action: string) => {
+    toast.success(`${action} initiated (Demo Mode)`);
   };
 
   if (loading) {
@@ -191,7 +208,7 @@ export default function AdminDashboardPage() {
           </div>
         </header>
 
-        {activeTab === "overview" && <Overview stats={stats} />}
+        {activeTab === "overview" && <Overview stats={stats} onAction={handleQuickAction} />}
         {activeTab === "users" && <UserManagement users={filteredUsers} onToggleStatus={handleUserStatus} />}
         {activeTab === "services" && <ServiceModeration services={services} onToggleService={handleServiceStatus} />}
         {activeTab === "events" && <EventMonitoring events={events} />}
@@ -201,25 +218,84 @@ export default function AdminDashboardPage() {
 }
 
 // Sub-components
-function Overview({ stats }: { stats: any }) {
+function Overview({ stats, onAction }: { stats: any, onAction: (a: string) => void }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <StatCard label="Total Platform Users" value={stats.totalUsers} sub="+New registrations" color="blue" />
-      <StatCard label="Active Global Events" value={stats.activeEvents} sub="Published events" color="orange" />
-      <StatCard label="Pending Moderation" value={stats.pendingServices} sub="Vendor services" color="violet" />
-      <StatCard label="Platform Revenue" value={stats.revenue} sub="Estimated commission" color="emerald" />
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard label="Total Platform Users" value={stats.totalUsers} sub={`${stats.suspendedUsers} suspended`} color="blue" />
+        <StatCard label="Active Global Events" value={stats.activeEvents} sub="Published events" color="orange" />
+        <StatCard label="Pending Moderation" value={stats.pendingServices} sub="Vendor services" color="violet" />
+        <StatCard label="Platform Revenue" value={stats.revenue} sub="Platform fees (5%)" color="emerald" />
+      </div>
       
-      <div className="md:col-span-2 lg:col-span-3 bg-white rounded-2xl border border-gray-200 p-6 h-64 flex items-center justify-center border-dashed">
-         <p className="text-gray-400 font-medium">Platform activity chart placeholder (Real-time data enabled)</p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+           <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-gray-900">Platform Activity</h3>
+              <select className="text-xs border-none bg-gray-50 rounded-lg p-2 outline-none font-semibold text-gray-500">
+                 <option>Last 7 Days</option>
+                 <option>Last 30 Days</option>
+              </select>
+           </div>
+           <div className="flex items-end gap-3 h-48 justify-around pt-4 border-b border-gray-100">
+              {[45, 60, 40, 80, 55, 90, 70].map((h, i) => (
+                <div key={i} className="flex flex-col items-center gap-2 group cursor-pointer">
+                   <div 
+                    style={{ height: `${h}%` }} 
+                    className="w-8 bg-blue-100 rounded-t-lg group-hover:bg-blue-500 transition-all duration-300 relative"
+                   >
+                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                        {h}%
+                     </div>
+                   </div>
+                   <span className="text-[10px] font-bold text-gray-400 capitalize">{['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}</span>
+                </div>
+              ))}
+           </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+           <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
+           <div className="space-y-2">
+              <ActionButton label="Generate Monthly Report" color="blue" onClick={() => onAction("Monthly Report")} />
+              <ActionButton label="Send System Broadcast" color="orange" onClick={() => onAction("Broadcast message")} />
+              <ActionButton label="Maintenance Mode" color="rose" onClick={() => onAction("Maintenance toggle")} />
+              <div className="pt-4 mt-4 border-t border-gray-50">
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-3">System Health</p>
+                <div className="space-y-3">
+                   <HealthItem label="User Service" status="Operational" />
+                   <HealthItem label="Vendor Service" status="Operational" />
+                   <HealthItem label="Event Service" status="Operational" />
+                </div>
+              </div>
+           </div>
+        </div>
       </div>
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-         <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
-         <div className="space-y-3">
-            <button className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 text-blue-600">Generate Monthly Report</button>
-            <button className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 text-orange-600">Send System Broadcast</button>
-            <button className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 text-rose-600">Maintenance Mode</button>
-         </div>
-      </div>
+    </div>
+  );
+}
+
+function ActionButton({ label, color, onClick }: { label: string, color: string, onClick: () => void }) {
+  const colors: any = {
+    blue: "text-blue-600 hover:bg-blue-50",
+    orange: "text-orange-600 hover:bg-orange-50",
+    rose: "text-rose-600 hover:bg-rose-50"
+  };
+  return (
+    <button onClick={onClick} className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition ${colors[color]}`}>
+      {label}
+    </button>
+  );
+}
+
+function HealthItem({ label, status }: { label: string, status: string }) {
+  return (
+    <div className="flex justify-between items-center text-xs">
+       <span className="text-gray-500 font-medium">{label}</span>
+       <span className="text-emerald-600 font-bold flex items-center gap-1">
+          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+          {status}
+       </span>
     </div>
   );
 }

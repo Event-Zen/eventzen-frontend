@@ -1,3 +1,4 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 type EventItem = {
@@ -8,65 +9,83 @@ type EventItem = {
   image?: string;
 };
 
-const upcomingEvents: EventItem[] = [
-  {
-    id: "1",
-    title: "Gala Night Extravaganza",
-    description:
-      "A glamorous evening filled with live music, exquisite dining, and dancing. Perfect for corporate gatherings or charity fundraisers.",
-    ticketPrice: "Rs. 1,000.00",
-    image: "/images/events/event1.jpg",
-  },
-  {
-    id: "2",
-    title: "Cultural Carnival",
-    description:
-      "A celebration of diverse cultures with traditional music, dance, food, and crafts from around the world. Enjoy the best of global cultures in one vibrant event.",
-    ticketPrice: "Rs. 1,000.00",
-    image: "/images/events/event2.jpg",
-  },
-  {
-    id: "3",
-    title: "Music Mania",
-    description:
-      "A live music festival featuring performances from various genres and artists. Ideal for music lovers looking to enjoy a day of great tunes and good vibes.",
-    ticketPrice: "Rs. 1,000.00",
-    image: "/images/events/event3.jpg",
-  },
-  {
-    id: "4",
-    title: "Foodie Fest",
-    description:
-      "A culinary festival with food trucks, gourmet chefs, tastings, and fun food-related workshops.",
-    ticketPrice: "Rs. 1,500.00",
-    image: "/images/events/event4.jpg",
-  },
-  {
-    id: "5",
-    title: "Tech Meetup 2026",
-    description:
-      "An engaging meetup for developers, designers, and tech enthusiasts to network and share ideas.",
-    ticketPrice: "Rs. 750.00",
-    image: "/images/events/event5.jpg",
+import { listPublishedEvents } from "../shared/api/eventClient";
 
-  },
-  {
-    id: "6",
-    title: "Art & Craft Expo",
-    description:
-      "Explore creative works, handmade items, live demonstrations, and inspiring local artists.",
-    ticketPrice: "Rs. 500.00",
-    image: "/images/events/event6.jpg",
-  },
-];
+type BackendEvent = {
+  _id: string;
+  title: string;
+  description?: string;
+  image?: string;
+};
 
 export default function UpcomingEventsPage() {
   const navigate = useNavigate();
+  const [upcomingEvents, setUpcomingEvents] = React.useState<EventItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const responseData = await listPublishedEvents();
+        // Assume API returns { success: true, data: [...] }
+        const data = responseData.data || [];
+        const mappedEvents: EventItem[] = data.map((ev: BackendEvent, i: number) => {
+          let displayDesc = ev.description || "";
+          let price = "Free";
+          
+          if (displayDesc.includes(" | Capacity: ")) {
+             const parts = displayDesc.split(" | ");
+             displayDesc = parts[0] || ""; // Base description
+             
+             // Parse price
+             const pricePart = parts.find((p: string) => p.startsWith("Price: "));
+             if (pricePart) {
+                 const priceVal = pricePart.replace("Price: ", "").trim();
+                 if (priceVal && priceVal !== "Free" && priceVal !== "0") {
+                   price = `Rs. ${Number(priceVal).toLocaleString("en-LK", {minimumFractionDigits: 2})}`;
+                 }
+             }
+          }
+
+          return {
+            id: ev._id,
+            title: ev.title,
+            description: displayDesc,
+            ticketPrice: price,
+            image: ev.image || `/images/events/event${(i % 6) + 1}.jpg`,
+          };
+        });
+        setUpcomingEvents(mappedEvents);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch events");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEvents();
+  }, []);
 
   const onBuy = (eventId: string) => {
     console.log("Selected event:", eventId);
     navigate("/payment");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-140px)] bg-slate-50 px-6 py-10 flex items-center justify-center">
+        <p className="text-xl font-semibold text-slate-500">Loading events...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[calc(100vh-140px)] bg-slate-50 px-6 py-10 flex items-center justify-center">
+        <p className="text-xl font-semibold text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-140px)] bg-slate-50 px-6 py-10">

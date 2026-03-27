@@ -55,7 +55,40 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="relative min-h-screen bg-gray-50 flex items-center justify-center p-4 overflow-hidden">
+      {/* Decorative Corner Squares */}
+      {/* Top Left */}
+      <div className="absolute top-10 left-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Top Right */}
+      <div className="absolute top-10 right-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Bottom Left */}
+      <div className="absolute bottom-10 left-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Bottom Right */}
+      <div className="absolute bottom-10 right-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
+        </div>
+      </div>
+
       <div className="w-full max-w-md rounded-xl bg-white shadow border border-gray-200 p-6 sm:p-8">
         <h1 className="text-2xl font-bold text-gray-900">Create account</h1>
         <p className="text-sm text-gray-600 mt-1">

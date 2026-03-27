@@ -12,6 +12,7 @@ import PlannerProfilePage from "./pages/PlannerProfilePage";
 import PaymentPage from "./pages/PaymentPage";
 import UpcomingEventsPage from "./pages/UpcomingEventsPage";
 import AttendeeProfilePage from "./pages/AttendeeProfilePage";
+import ChatBotInterface from "./pages/ChatBotInterface";
 
 import { RoleRoute } from "./features/auth/ui/RoleRoute";
 import { ProtectedRoute } from "./features/auth/ui/ProtectedRoute";
@@ -130,6 +131,17 @@ function App() {
             <MainLayout>
               <UpcomingEventsPage />
             </MainLayout>
+          }
+        />
+
+        <Route
+          path="/chatbot"
+          element={
+            <RoleRoute allow={["PLANNER"]}>
+              <MainLayout>
+                <ChatBotInterface />
+              </MainLayout>
+            </RoleRoute>
           }
         />
 

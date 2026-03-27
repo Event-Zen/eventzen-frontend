@@ -21,12 +21,25 @@ const SERVICE_CATEGORIES = [
 export default function AddServicePage() {
   const navigate = useNavigate();
 
+  const getLoggedInVendorEmail = () => {
+    const rawUser = localStorage.getItem("user");
+    if (!rawUser) return "";
+    try {
+      const parsed = JSON.parse(rawUser);
+      return parsed?.email || "";
+    } catch {
+      return "";
+    }
+  };
+
+  const loggedInVendorEmail = getLoggedInVendorEmail();
+
   const [form, setForm] = useState<ServiceForm>({
     serviceName: "",
     serviceType: "",
     description: "",
     price: "",
-    vendorEmail: "",
+    vendorEmail: loggedInVendorEmail,
     vendorPhone: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -49,7 +62,7 @@ export default function AddServicePage() {
         category: form.serviceType,
         description: form.description,
         price: Number(form.price),
-        vendorEmail: form.vendorEmail,
+        vendorEmail: form.vendorEmail || loggedInVendorEmail,
         vendorPhone: form.vendorPhone,
         availableDates: [new Date()], // Just defaulting to now for creation
       });
@@ -160,6 +173,7 @@ export default function AddServicePage() {
               onChange={(e) => setField("vendorEmail", e.target.value)}
               className="input"
               placeholder="your.email@example.com"
+              readOnly={!!loggedInVendorEmail}
             />
           </Field>
 

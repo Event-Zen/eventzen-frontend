@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Pencil } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
-import { getMyVendorServices } from "../shared/api/vendorClient";
+import { getMyVendorServices, listVendorServices } from "../shared/api/vendorClient";
 
 type Vendor = {
   name: string;
@@ -18,6 +18,97 @@ type VendorService = {
   description: string;
   price: string;
 };
+
+type AuthUser = {
+  id?: string;
+  _id?: string;
+  email?: string;
+  name?: string;
+};
+
+function readAuthUser(): AuthUser | null {
+  const raw = localStorage.getItem("user");
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as AuthUser;
+  } catch {
+    return null;
+  }
+}
+
+function extractServiceArray(res: any): any[] {
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res?.data)) return res.data;
+  if (Array.isArray(res?.services)) return res.services;
+  if (Array.isArray(res?.items)) return res.items;
+  if (Array.isArray(res?.results)) return res.results;
+  if (Array.isArray(res?.rows)) return res.rows;
+  if (Array.isArray(res?.data?.services)) return res.data.services;
+  if (Array.isArray(res?.data?.items)) return res.data.items;
+  if (Array.isArray(res?.data?.results)) return res.data.results;
+  if (Array.isArray(res?.data?.rows)) return res.data.rows;
+  if (Array.isArray(res?.data?.data)) return res.data.data;
+  return [];
+}
+
+function belongsToVendor(service: any, user: AuthUser | null) {
+  if (!user) return true;
+
+  const vendorIdCandidates = [
+    service?.vendorId,
+    service?.vendor?._id,
+    service?.vendor?.id,
+    service?.ownerId,
+    service?.createdBy,
+    service?.createdById,
+    service?.userId,
+  ]
+    .filter(Boolean)
+    .map((value) => String(value));
+
+  const vendorEmailCandidates = [service?.vendorEmail, service?.vendor?.email, service?.email]
+    .filter(Boolean)
+    .map((value) => String(value).toLowerCase());
+
+  const vendorNameCandidates = [service?.vendorName, service?.vendor?.name]
+    .filter(Boolean)
+    .map((value) => String(value).toLowerCase());
+
+  const userIds = [user.id, user._id].filter(Boolean).map((value) => String(value));
+  const userEmail = String(user.email || "").toLowerCase();
+  const userName = String(user.name || "").toLowerCase();
+
+  const idMatch = userIds.some((id) => vendorIdCandidates.includes(id));
+  const emailMatch = !!userEmail && vendorEmailCandidates.includes(userEmail);
+  const nameMatch = !!userName && vendorNameCandidates.includes(userName);
+
+  return idMatch || emailMatch || nameMatch;
+}
+
+function dedupeById(items: any[]) {
+  const byId = new Map<string, any>();
+  items.forEach((item) => {
+    const key = String(item?._id || item?.id || "");
+    if (key && !byId.has(key)) {
+      byId.set(key, item);
+    }
+  });
+  return Array.from(byId.values());
+}
+
+function hasVendorIdentityFields(service: any) {
+  return Boolean(
+    service?.vendorId ||
+      service?.vendor?._id ||
+      service?.vendor?.id ||
+      service?.ownerId ||
+      service?.createdBy ||
+      service?.createdById ||
+      service?.userId ||
+      service?.vendorEmail ||
+      service?.vendor?.email,
+  );
+}
 
 function FieldRow({
   label,
@@ -73,31 +164,60 @@ export default function VendorProfilePage() {
 
   const [services, setServices] = useState<VendorService[]>([]);
   const [loadingServices, setLoadingServices] = useState(true);
+  const [servicesError, setServicesError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchServices = async () => {
+      const user = readAuthUser();
+      let myServices: any[] = [];
+      let vendorServicesRaw: any[] = [];
+      let myFetchFailed = false;
+      let allFetchFailed = false;
+
       try {
-        const res = await getMyVendorServices();
-        console.log("Fetched my services:", res);
+        const myRes = await getMyVendorServices();
+        myServices = extractServiceArray(myRes);
+        vendorServicesRaw = myServices;
+      } catch (err) {
+        myFetchFailed = true;
+        console.error("Failed to load /me vendor services", err);
+      }
 
-        let dataArray = [];
-        if (res && res.success && Array.isArray(res.data)) {
-          dataArray = res.data;
-        } else if (Array.isArray(res)) {
-          dataArray = res;
-        } else if (res && Array.isArray(res.data)) {
-          dataArray = res.data;
+      // Fallback for backends where /me returns only latest service or errors.
+      if (myServices.length <= 1) {
+        try {
+          const allRes = await listVendorServices();
+          const allServices = extractServiceArray(allRes);
+
+          const hasIdentity = allServices.some((service: any) => hasVendorIdentityFields(service));
+          const filtered = hasIdentity
+            ? allServices.filter((service: any) => belongsToVendor(service, user))
+            : allServices;
+
+          if (filtered.length > 0 || myServices.length > 0) {
+            vendorServicesRaw = dedupeById([...myServices, ...filtered]);
+          }
+        } catch (err) {
+          allFetchFailed = true;
+          console.error("Failed to load full vendor services list", err);
         }
+      }
 
-        const formatted = dataArray.map((s: any) => ({
+      try {
+        const formatted = vendorServicesRaw.map((s: any) => ({
           id: s._id || s.id,
           title: s.serviceName || "Untitled Service",
           description: s.description || "No description provided.",
           price: s.price != null ? `Rs. ${Number(s.price).toLocaleString("en-LK")}` : "Price not set",
         }));
+
+        if (myFetchFailed && allFetchFailed) {
+          setServicesError("Unable to load services right now. Vendor service backend returned an error.");
+        } else {
+          setServicesError(null);
+        }
+
         setServices(formatted);
-      } catch (err) {
-        console.error("Failed to load vendor services", err);
       } finally {
         setLoadingServices(false);
       }
@@ -242,6 +362,8 @@ export default function VendorProfilePage() {
             <div className="mt-6 space-y-4">
               {loadingServices ? (
                 <div className="text-sm text-slate-500 text-center py-4">Loading services...</div>
+              ) : servicesError ? (
+                <div className="text-sm text-red-600 text-center py-4">{servicesError}</div>
               ) : services.length === 0 ? (
                 <div className="text-sm text-slate-500 text-center py-4">No services added yet.</div>
               ) : services.map((s) => (

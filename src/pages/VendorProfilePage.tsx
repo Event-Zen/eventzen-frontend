@@ -145,15 +145,16 @@ function FieldRow({
 
 // This dummy data should be replace from API call
 export default function VendorProfilePage() {
+  const user = readAuthUser();
   const initialVendor: Vendor = useMemo(
     () => ({
-      name: "Dhanuka Navod",
-      email: "dhanuka@gmail.com",
+      name: user?.name || "Dhanuka Navod",
+      email: user?.email || "dhanuka@gmail.com",
       mobile: "(+94) 77 1231234",
       location: "Dehigahalanda, Ambalantota",
       avatarUrl: "",
     }),
-    []
+    [user]
   );
 
   const navigate = useNavigate();

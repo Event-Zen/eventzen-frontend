@@ -52,7 +52,20 @@ function initialsFromName(name: string) {
 }
 
 export default function AttendeeProfilePage() {
-  const [form, setForm] = useState<ProfileForm>(initialProfile);
+  const [form, setForm] = useState<ProfileForm>(() => {
+    const raw = localStorage.getItem("user");
+    let u: any = {};
+    if (raw) {
+      try {
+        u = JSON.parse(raw);
+      } catch {}
+    }
+    return {
+      ...initialProfile,
+      name: u.name || initialProfile.name,
+      email: u.email || initialProfile.email,
+    };
+  });
   const [events] = useState<EventItem[]>(initialEvents);
 
   const avatarFallback = useMemo(() => initialsFromName(form.name), [form.name]);

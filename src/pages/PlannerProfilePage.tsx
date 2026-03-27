@@ -59,15 +59,25 @@ export default function PlannerProfilePage() {
     const navigate = useNavigate();
 
     // demo data
+    const user = useMemo(() => {
+        const raw = localStorage.getItem("user");
+        if (!raw) return null;
+        try {
+            return JSON.parse(raw);
+        } catch {
+            return null;
+        }
+    }, []);
+
     const initialPlanner: Planner = useMemo(
         () => ({
-            name: "Kasun Madushan",
-            email: "kasun@gmail.com",
+            name: user?.name || "Kasun Madushan",
+            email: user?.email || "kasun@gmail.com",
             mobile: "(+94) 77 1212654",
             location: "Weligama, Matara",
             avatarUrl: "", // optional
         }),
-        []
+        [user]
     );
 
     const [planner, setPlanner] = useState<Planner>(initialPlanner);

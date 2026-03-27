@@ -14,6 +14,7 @@ import PaymentPage from "./pages/PaymentPage";
 import UpcomingEventsPage from "./pages/UpcomingEventsPage";
 import AttendeeProfilePage from "./pages/AttendeeProfilePage";
 import ChatBotInterface from "./pages/ChatBotInterface";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 import { Toaster } from "react-hot-toast";
 
 import { RoleRoute } from "./features/auth/ui/RoleRoute";
@@ -165,6 +166,16 @@ function App() {
             <MainLayout>
               <AttendeeProfilePage />
             </MainLayout>
+          }
+        />
+
+        {/* Admin only */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <RoleRoute allow={["ADMIN"]}>
+              <AdminDashboardPage />
+            </RoleRoute>
           }
         />
       </Routes>

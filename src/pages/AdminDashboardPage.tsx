@@ -1,0 +1,299 @@
+import { useState, useMemo } from "react";
+import { 
+  Users, 
+  LayoutDashboard, 
+  ShieldCheck, 
+  Calendar, 
+  TrendingUp, 
+  Search,
+  CheckCircle,
+  XCircle,
+  MoreVertical
+} from "lucide-react";
+
+// Types
+type Tab = "overview" | "users" | "services" | "events";
+
+type UserRecord = {
+  id: string;
+  name: string;
+  email: string;
+  role: "ATTENDEE" | "VENDOR" | "PLANNER";
+  status: "active" | "blocked";
+  createdAt: string;
+};
+
+type ServiceModeration = {
+  id: string;
+  vendorName: string;
+  serviceName: string;
+  category: string;
+  price: number;
+  status: "pending" | "approved" | "rejected";
+};
+
+// Mock Data
+const MOCK_USERS: UserRecord[] = [
+  { id: "u1", name: "Dhanuka Navod", email: "dhanuka@gmail.com", role: "VENDOR", status: "active", createdAt: "2024-03-20" },
+  { id: "u2", name: "Kasun Madushan", email: "kasun@gmail.com", role: "PLANNER", status: "active", createdAt: "2024-03-21" },
+  { id: "u3", name: "Janith Perera", email: "janith@gmail.com", role: "ATTENDEE", status: "blocked", createdAt: "2024-03-22" },
+  { id: "u4", name: "Saman Kumara", email: "saman@gmail.com", role: "VENDOR", status: "active", createdAt: "2024-03-23" },
+];
+
+const MOCK_SERVICES: ServiceModeration[] = [
+  { id: "s1", vendorName: "Dhanuka Navod", serviceName: "DJ & Sound System", category: "music", price: 25000, status: "pending" },
+  { id: "s2", vendorName: "Saman Kumara", serviceName: "Elegant Floral Decor", category: "decor", price: 45000, status: "pending" },
+  { id: "s3", vendorName: "Dhanuka Navod", serviceName: "Stage Lighting", category: "light", price: 15000, status: "approved" },
+];
+
+export default function AdminDashboardPage() {
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredUsers = useMemo(() => 
+    MOCK_USERS.filter(u => 
+      u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      u.email.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [searchTerm]);
+
+  const stats = {
+    totalUsers: MOCK_USERS.length,
+    activeEvents: 12,
+    pendingServices: MOCK_SERVICES.filter(s => s.status === "pending").length,
+    revenue: "Rs. 1.2M",
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-slate-900 text-white flex flex-col fixed inset-y-0">
+        <div className="p-6 border-b border-slate-800 flex items-center gap-3">
+          <div className="h-8 w-8 bg-blue-500 rounded-lg flex items-center justify-center">
+             <ShieldCheck size={20} />
+          </div>
+          <span className="font-bold text-lg tracking-tight text-white">Admin Central</span>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-2 mt-4">
+          <SidebarLink 
+            icon={<LayoutDashboard size={20} />} 
+            label="Overview" 
+            active={activeTab === "overview"} 
+            onClick={() => setActiveTab("overview")} 
+          />
+          <SidebarLink 
+            icon={<Users size={20} />} 
+            label="User Management" 
+            active={activeTab === "users"} 
+            onClick={() => setActiveTab("users")} 
+          />
+          <SidebarLink 
+            icon={<ShieldCheck size={20} />} 
+            label="Service Moderation" 
+            active={activeTab === "services"} 
+            onClick={() => setActiveTab("services")} 
+          />
+          <SidebarLink 
+            icon={<Calendar size={20} />} 
+            label="Global Events" 
+            active={activeTab === "events"} 
+            onClick={() => setActiveTab("events")} 
+          />
+        </nav>
+
+        <div className="p-4 border-t border-slate-800">
+           <div className="bg-slate-800/50 rounded-xl p-3 flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs">AD</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold truncate">System Admin</p>
+                <p className="text-[10px] text-slate-400 truncate">admin@eventzen.com</p>
+              </div>
+           </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 ml-64 p-8">
+        <header className="flex justify-between items-center mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 capitalize">{activeTab.replace("-", " ")}</h2>
+            <p className="text-gray-500 text-sm">System management and monitoring</p>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <input 
+                type="text" 
+                placeholder="Search anything..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-64 text-sm"
+              />
+            </div>
+            <button className="h-10 w-10 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-white transition shadow-sm">
+              <TrendingUp size={18} className="text-gray-600" />
+            </button>
+          </div>
+        </header>
+
+        {activeTab === "overview" && <Overview stats={stats} />}
+        {activeTab === "users" && <UserManagement users={filteredUsers} />}
+        {activeTab === "services" && <ServiceModeration services={MOCK_SERVICES} />}
+        {activeTab === "events" && (
+          <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
+            <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900">Event Monitoring</h3>
+            <p className="text-gray-500 max-w-xs mx-auto mt-2">Global event tracking and logs will be displayed here in the next update.</p>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+// Sub-components
+function Overview({ stats }: { stats: any }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <StatCard label="Total Platform Users" value={stats.totalUsers} sub="+12% from last month" color="blue" />
+      <StatCard label="Active Global Events" value={stats.activeEvents} sub="Running currently" color="orange" />
+      <StatCard label="Pending Moderation" value={stats.pendingServices} sub="Vendor services" color="violet" />
+      <StatCard label="Platform Revenue" value={stats.revenue} sub="Estimated commission" color="emerald" />
+      
+      <div className="md:col-span-2 lg:col-span-3 bg-white rounded-2xl border border-gray-200 p-6 h-64 flex items-center justify-center border-dashed">
+         <p className="text-gray-400 font-medium">Platform activity chart placeholder</p>
+      </div>
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+         <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
+         <div className="space-y-3">
+            <button className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 text-blue-600">Generate Monthly Report</button>
+            <button className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 text-orange-600">Send System Broadcast</button>
+            <button className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 text-rose-600">Maintenance Mode</button>
+         </div>
+      </div>
+    </div>
+  );
+}
+
+function UserManagement({ users }: { users: UserRecord[] }) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <table className="w-full text-left">
+        <thead className="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px] font-bold tracking-wider">
+          <tr>
+            <th className="px-6 py-4 font-bold">User</th>
+            <th className="px-6 py-4 font-bold">Role</th>
+            <th className="px-6 py-4 font-bold">Status</th>
+            <th className="px-6 py-4 font-bold">Created</th>
+            <th className="px-6 py-4 font-bold">Action</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {users.map(u => (
+            <tr key={u.id} className="hover:bg-gray-50 transition-colors group">
+              <td className="px-6 py-4 flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-400">{u.name.charAt(0)}</div>
+                <div>
+                  <div className="font-bold text-gray-900">{u.name}</div>
+                  <div className="text-xs text-gray-500">{u.email}</div>
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${
+                  u.role === "VENDOR" ? "bg-orange-50 text-orange-700 border border-orange-100" :
+                  u.role === "PLANNER" ? "bg-blue-50 text-blue-700 border border-blue-100" : "bg-teal-50 text-teal-700 border border-teal-100"
+                }`}>
+                  {u.role}
+                </span>
+              </td>
+              <td className="px-6 py-4">
+                 <span className={`flex items-center gap-1.5 text-sm ${u.status === 'active' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    <div className={`h-1.5 w-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-600' : 'bg-rose-600'}`}></div>
+                    {u.status}
+                 </span>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-500">{u.createdAt}</td>
+              <td className="px-6 py-4">
+                 <button className="h-8 w-8 hover:bg-white rounded-lg flex items-center justify-center border border-transparent hover:border-gray-200 transition">
+                    <MoreVertical size={16} className="text-gray-400" />
+                 </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ServiceModeration({ services }: { services: ServiceModeration[] }) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+       {services.map(s => (
+         <div key={s.id} className="bg-white rounded-2xl border border-gray-200 p-6 flex items-start justify-between shadow-sm">
+            <div className="flex gap-4">
+               <div className="h-12 w-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center">
+                  <LayoutDashboard className="text-slate-400" size={24} />
+               </div>
+               <div>
+                  <h4 className="font-bold text-gray-900">{s.serviceName}</h4>
+                  <p className="text-xs text-gray-500 mb-2">by {s.vendorName} • {s.category}</p>
+                  <div className="text-xl font-bold text-blue-600">Rs. {s.price.toLocaleString()}</div>
+               </div>
+            </div>
+            
+            <div className="flex flex-col items-end gap-3">
+               <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                  s.status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 
+                  s.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
+               }`}>
+                 {s.status}
+               </span>
+               
+               {s.status === 'pending' && (
+                 <div className="flex gap-2">
+                    <button className="h-8 w-8 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center hover:bg-rose-100 transition border border-rose-100"><XCircle size={18} /></button>
+                    <button className="h-8 w-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center hover:bg-emerald-100 transition border border-emerald-100"><CheckCircle size={18} /></button>
+                 </div>
+               )}
+            </div>
+         </div>
+       ))}
+    </div>
+  );
+}
+
+// Helpers
+function SidebarLink({ icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) {
+  return (
+    <button 
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+        active 
+          ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40" 
+          : "text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+      }`}
+    >
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function StatCard({ label, value, sub, color }: { label: string, value: any, sub: string, color: string }) {
+  const colorMap: any = {
+    blue: "bg-blue-50 text-blue-600 border-blue-100",
+    orange: "bg-orange-50 text-orange-600 border-orange-100",
+    violet: "bg-violet-50 text-violet-600 border-violet-100",
+    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
+  };
+  
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+      <div className="text-gray-500 text-xs font-bold uppercase mb-2">{label}</div>
+      <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
+      <div className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${colorMap[color]}`}>{sub}</div>
+    </div>
+  );
+}

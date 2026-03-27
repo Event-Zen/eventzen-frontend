@@ -1,7 +1,7 @@
 import { Search, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthUser } from "../features/auth/hooks/useAuthUser";
-import { dashboardPath, profilePath } from "../features/auth/utils/rolePaths";
+import { profilePath } from "../features/auth/utils/rolePaths";
 
 const Header = () => {
   const { user, isAuthed, logout } = useAuthUser();
@@ -9,6 +9,7 @@ const Header = () => {
 
   const isAttendee = user?.role === "ATTENDEE";
   const isPlanner = user?.role === "PLANNER";
+  const isAdmin = user?.role === "ADMIN";
 
   function onLogout() {
     logout();
@@ -68,6 +69,12 @@ const Header = () => {
             <span>Help Center</span>
             <ChevronDown size={16} />
           </Link>
+
+          {isAdmin && (
+            <Link to="/admin/dashboard" className="hover:text-blue-500 transition font-bold text-blue-600">
+              Admin Dashboard
+            </Link>
+          )}
 
           {/* If logged in show Dashboard/Profile + Logout */}
           {isAuthed && user ? (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuthUser } from '../features/auth/hooks/useAuthUser';
 
 function ChatBotInterface() {

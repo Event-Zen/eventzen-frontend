@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const vendorApi = axios.create({
-  baseURL: import.meta.env.VITE_VENDOR_SERVICE_URL || "http://localhost:5004/api/vendor-services",
+  baseURL: import.meta.env.VITE_VENDOR_SERVICE_URL || "http://localhost:5006/api/vendor-services",
   withCredentials: true,
 });
 

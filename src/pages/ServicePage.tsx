@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { selectVendorsApi } from "../shared/api/eventClient";
+import { listVendorServices } from "../shared/api/vendorClient";
 import { jsPDF } from "jspdf";
 
 type ServiceItem = {
@@ -30,165 +31,59 @@ const ServicesPage: React.FC = () => {
   const eventId: string | null =
     (location.state as any)?.eventId || sessionStorage.getItem("activeEventId");
 
-  // TODO: Replace with your real data later (API/context)
-  const categories: ServiceCategory[] = useMemo(
-    () => [
-      {
-        id: "music",
-        title: "Music",
-        items: [
-          {
-            id: "music-1",
-            name: "Amila Band",
-            vendor: "Amila Band & Events",
-            phone: "077 123 4567",
-            price: 20000,
-            imageUrl: "https://i.pravatar.cc/120?img=12",
-          },
-          {
-            id: "music-2",
-            name: "Sajith Sounds",
-            vendor: "Sajith Sounds",
-            phone: "077 222 3344",
-            price: 50000,
-            imageUrl: "https://i.pravatar.cc/120?img=13",
-          },
-          {
-            id: "music-3",
-            name: "Nuwan DJ",
-            vendor: "DJ Nuwan",
-            phone: "077 987 6543",
-            price: 25000,
-            imageUrl: "https://i.pravatar.cc/120?img=14",
-          },
-          {
-            id: "music-4",
-            name: "Amal Mix",
-            vendor: "Amal Mix Pro",
-            phone: "071 555 9090",
-            price: 15000,
-            imageUrl: "https://i.pravatar.cc/120?img=15",
-          },
-        ],
-      },
-      {
-        id: "light",
-        title: "Light",
-        items: [
-          {
-            id: "light-1",
-            name: "Helio Lights",
-            vendor: "Helio Lights",
-            phone: "077 444 1122",
-            price: 18000,
-            imageUrl: "https://i.pravatar.cc/120?img=16",
-          },
-          {
-            id: "light-2",
-            name: "Neon Art",
-            vendor: "Neon Art",
-            phone: "071 333 2211",
-            price: 22000,
-            imageUrl: "https://i.pravatar.cc/120?img=17",
-          },
-          {
-            id: "light-3",
-            name: "Aura Light",
-            vendor: "Aura Light",
-            phone: "075 111 7777",
-            price: 30000,
-            imageUrl: "https://i.pravatar.cc/120?img=18",
-          },
-          {
-            id: "light-4",
-            name: "Joon Arc",
-            vendor: "Joon Arc",
-            phone: "077 888 9999",
-            price: 20000,
-            imageUrl: "https://i.pravatar.cc/120?img=19",
-          },
-        ],
-      },
-      {
-        id: "decor",
-        title: "Decorations",
-        items: [
-          {
-            id: "decor-1",
-            name: "Aroca Decor",
-            vendor: "Aroca Decor",
-            phone: "077 111 2222",
-            price: 35000,
-            imageUrl: "https://i.pravatar.cc/120?img=20",
-          },
-          {
-            id: "decor-2",
-            name: "Noona Events",
-            vendor: "Noona Events",
-            phone: "071 444 5555",
-            price: 42000,
-            imageUrl: "https://i.pravatar.cc/120?img=21",
-          },
-          {
-            id: "decor-3",
-            name: "Lakshita Flowers",
-            vendor: "Lakshita Flowers",
-            phone: "077 222 8888",
-            price: 30000,
-            imageUrl: "https://i.pravatar.cc/120?img=22",
-          },
-          {
-            id: "decor-4",
-            name: "Joon Arch",
-            vendor: "Joon Arch",
-            phone: "070 000 1111",
-            price: 25000,
-            imageUrl: "https://i.pravatar.cc/120?img=23",
-          },
-        ],
-      },
-      {
-        id: "food",
-        title: "Food & Beverages",
-        items: [
-          {
-            id: "food-1",
-            name: "Royal Catering",
-            vendor: "Royal Catering",
-            phone: "077 123 9999",
-            price: 70000,
-            imageUrl: "https://i.pravatar.cc/120?img=24",
-          },
-          {
-            id: "food-2",
-            name: "Blue Spoon",
-            vendor: "Blue Spoon",
-            phone: "076 222 3333",
-            price: 65000,
-            imageUrl: "https://i.pravatar.cc/120?img=25",
-          },
-          {
-            id: "food-3",
-            name: "Shalika Cakes",
-            vendor: "Shalika Cakes",
-            phone: "077 777 2323",
-            price: 12000,
-            imageUrl: "https://i.pravatar.cc/120?img=26",
-          },
-        ],
-      },
-    ],
-    []
-  );
+  // Fetch categories using API
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await listVendorServices();
+        if (res && res.data) {
+          const grouped: Record<string, ServiceItem[]> = {};
+          res.data.forEach((srv: any) => {
+            if (!grouped[srv.category]) {
+              grouped[srv.category] = [];
+            }
+            grouped[srv.category].push({
+              id: srv._id,
+              name: srv.serviceName,
+              vendor: srv.vendorName || "Vendor",
+              phone: srv.vendorPhone || "",
+              price: srv.price,
+              imageUrl: `https://i.pravatar.cc/120?u=${srv._id}`,
+            });
+          });
+
+          const catTitles: Record<string, string> = {
+            music: "Music",
+            light: "Light",
+            decor: "Decorations",
+            food: "Food & Beverages",
+          };
+
+          const formattedCategories: ServiceCategory[] = Object.keys(grouped).map(
+            (catId) => ({
+              id: catId,
+              title: catTitles[catId] || catId,
+              items: grouped[catId],
+            })
+          );
+          setCategories(formattedCategories);
+        }
+      } catch (err) {
+        console.error("Failed to fetch vendor services", err);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   // select ONE per category (like your design)
   const [selectedByCategory, setSelectedByCategory] = useState<
     Record<string, string | null>
-  >(() => {
-    const init: Record<string, string | null> = {};
-    categories.forEach((c) => (init[c.id] = null));
-    return init;
-  });
+  >({});
 
   // Hydrate vendor selections from sessionStorage (set by PlannerProfilePage on edit)
   useEffect(() => {
@@ -422,7 +317,11 @@ const ServicesPage: React.FC = () => {
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_320px]">
         {/* LEFT */}
         <div className="space-y-6">
-          {categories.map((cat) => (
+          {loadingServices ? (
+            <div className="text-gray-500 text-sm">Loading services...</div>
+          ) : categories.length === 0 ? (
+            <div className="text-gray-500 text-sm">No services found. Add some from the vendor profile!</div>
+          ) : categories.map((cat) => (
             <section key={cat.id}>
               <h2 className="mb-3 text-sm font-bold text-slate-900">
                 {cat.title}
@@ -462,13 +361,13 @@ const ServicesPage: React.FC = () => {
                       </div>
 
                       <div className="space-y-0.5">
-                        <div className="text-xs font-bold text-slate-900">
+                        <div className="text-xs font-bold text-slate-900 truncate" title={item.name}>
                           {item.name}
                         </div>
-                        <div className="text-[11px] text-slate-700">
+                        <div className="text-[11px] text-slate-700 truncate" title={item.vendor}>
                           {item.vendor}
                         </div>
-                        <div className="text-[11px] text-slate-700">
+                        <div className="text-[11px] text-slate-700 truncate">
                           {item.phone}
                         </div>
                         <div className="pt-1 text-[11px] font-bold text-slate-900">

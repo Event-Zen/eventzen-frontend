@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createVendorService } from "../shared/api/vendorClient";
 
 type ServiceForm = {
+  serviceName: string;
   serviceType: string;
   description: string;
   price: string;
+  vendorEmail: string;
+  vendorPhone: string;
 };
 
 const SERVICE_CATEGORIES = [
@@ -18,10 +22,14 @@ export default function AddServicePage() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState<ServiceForm>({
+    serviceName: "",
     serviceType: "",
     description: "",
     price: "",
+    vendorEmail: "",
+    vendorPhone: "",
   });
+  const [submitting, setSubmitting] = useState(false);
 
   const setField = <K extends keyof ServiceForm>(key: K, value: ServiceForm[K]) => {
     setForm((p) => ({ ...p, [key]: value }));
@@ -31,13 +39,28 @@ export default function AddServicePage() {
     navigate("/vendor-profile");
   };
 
-  const onAdd = (e: React.FormEvent) => {
+  const onAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
 
-    // TODO: Replace this part with API call
-    console.log("Add Service Payload:", form);
-    alert("Service added.");
-    navigate("/vendor-profile");
+    try {
+      await createVendorService({
+        serviceName: form.serviceName,
+        category: form.serviceType,
+        description: form.description,
+        price: Number(form.price),
+        vendorEmail: form.vendorEmail,
+        vendorPhone: form.vendorPhone,
+        availableDates: [new Date()], // Just defaulting to now for creation
+      });
+      alert("Service added successfully.");
+      navigate("/vendor-profile");
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || err.message || "Failed to add service");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -81,8 +104,19 @@ export default function AddServicePage() {
         <p className="text-sm text-gray-600 mt-1">List a new service for your vendor profile</p>
 
         <form onSubmit={onAdd} className="mt-6 space-y-4">
+          <Field label="Service Name">
+            <input
+              required
+              value={form.serviceName}
+              onChange={(e) => setField("serviceName", e.target.value)}
+              className="input"
+              placeholder="e.g. Premium DJ Setup"
+            />
+          </Field>
+
           <Field label="Service Category">
             <select
+              required
               value={form.serviceType}
               onChange={(e) => setField("serviceType", e.target.value)}
               className="input"
@@ -98,6 +132,7 @@ export default function AddServicePage() {
 
           <Field label="Description">
             <input
+              required
               value={form.description}
               onChange={(e) => setField("description", e.target.value)}
               className="input"
@@ -107,11 +142,35 @@ export default function AddServicePage() {
 
           <Field label="Price (Rs)">
             <input
+              required
               value={form.price}
               onChange={(e) => setField("price", e.target.value)}
               className="input"
               placeholder="0"
               type="number"
+              min="0"
+            />
+          </Field>
+
+          <Field label="Vendor Email">
+            <input
+              required
+              type="email"
+              value={form.vendorEmail}
+              onChange={(e) => setField("vendorEmail", e.target.value)}
+              className="input"
+              placeholder="your.email@example.com"
+            />
+          </Field>
+
+          <Field label="Vendor Phone Number">
+            <input
+              required
+              type="tel"
+              value={form.vendorPhone}
+              onChange={(e) => setField("vendorPhone", e.target.value)}
+              className="input"
+              placeholder="e.g. 077 123 4567"
             />
           </Field>
 
@@ -126,9 +185,10 @@ export default function AddServicePage() {
 
             <button
               type="submit"
-              className="flex-1 rounded-lg bg-blue-600 text-white py-2.5 font-semibold hover:bg-blue-700 transition"
+              disabled={submitting}
+              className="flex-1 rounded-lg bg-blue-600 text-white py-2.5 font-semibold hover:bg-blue-700 transition disabled:opacity-50"
             >
-              Add Service
+              {submitting ? "Adding..." : "Add Service"}
             </button>
           </div>
         </form>

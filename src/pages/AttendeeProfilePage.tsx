@@ -1,6 +1,7 @@
 // src/pages/AttendeeProfilePage.tsx
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Pencil } from "lucide-react";
+import GoogleCalendarButton from "../components/GoogleCalendarButton";
 
 type ProfileForm = {
   name: string;
@@ -163,6 +164,15 @@ export default function AttendeeProfilePage() {
               >
                 Save Change
               </button>
+            </div>
+
+            {/* Reminders & Calendar */}
+            <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Reminders & Calendar</h3>
+              <p className="text-xs text-gray-600 mb-3">
+                Open Google Calendar to add reminders for your upcoming events.
+              </p>
+              <GoogleCalendarButton />
             </div>
           </div>
         </div>

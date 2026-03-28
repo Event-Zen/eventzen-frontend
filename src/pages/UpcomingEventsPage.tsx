@@ -48,18 +48,18 @@ export default function UpcomingEventsPage() {
         const mappedEvents: EventItem[] = data.map((ev: BackendEvent, i: number) => {
           let displayDesc = ev.description || "";
           let price = "Free";
-          
+
           if (displayDesc.includes(" | Capacity: ")) {
-             const parts = displayDesc.split(" | ");
-             displayDesc = parts[0] || ""; 
-             
-             const pricePart = parts.find((p: string) => p.startsWith("Price: "));
-             if (pricePart) {
-                 const priceVal = pricePart.replace("Price: ", "").trim();
-                 if (priceVal && priceVal !== "Free" && priceVal !== "0") {
-                   price = `Rs. ${Number(priceVal).toLocaleString("en-LK", {minimumFractionDigits: 2})}`;
-                 }
-             }
+            const parts = displayDesc.split(" | ");
+            displayDesc = parts[0] || "";
+
+            const pricePart = parts.find((p: string) => p.startsWith("Price: "));
+            if (pricePart) {
+              const priceVal = pricePart.replace("Price: ", "").trim();
+              if (priceVal && priceVal !== "Free" && priceVal !== "0") {
+                price = `Rs. ${Number(priceVal).toLocaleString("en-LK", { minimumFractionDigits: 2 })}`;
+              }
+            }
           }
 
           return {
@@ -148,14 +148,13 @@ export default function UpcomingEventsPage() {
                     disabled={!isAttendee}
                     title={!isAttendee ? "Only attendees can purchase tickets" : ""}
                     className={`rounded-md px-4 py-2 text-xs font-semibold text-white transition-all
-                      ${
-                        isAttendee
-                          ? "bg-red-700 hover:bg-red-800"
-                          : "bg-slate-400 cursor-not-allowed grayscale"
+                      ${isAttendee
+                        ? "bg-red-700 hover:bg-red-800"
+                        : "bg-slate-400 cursor-not-allowed grayscale"
                       }
                     `}
                   >
-                    {isAttendee ? "Buy" : "Buy (Disabled)"}
+                    {isAttendee ? "Buy Ticket" : "Buy (Attendees Only)"}
                   </button>
                 </div>
               </div>

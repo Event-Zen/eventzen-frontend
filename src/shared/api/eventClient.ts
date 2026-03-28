@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const eventApi = axios.create({
-  baseURL: import.meta.env.VITE_EVENT_SERVICE_URL || "http://localhost:5002/api/events",
+  baseURL: `${import.meta.env.VITE_EVENT_SERVICE_URL || "http://localhost:5002"}/api/events`,
   withCredentials: true,
 });
 
@@ -41,5 +41,10 @@ export const getMyEvents = async () => {
 
 export const getEventById = async (id: string) => {
   const response = await eventApi.get(`/${id}`);
+  return response.data;
+};
+
+export const listEventsAdmin = async () => {
+  const response = await eventApi.get("/admin");
   return response.data;
 };

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useRegister } from "../hooks/useRegister"; 
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
-type Role = "ATTENDEE" | "VENDOR" | "PLANNER";
+type Role = "ATTENDEE" | "VENDOR" | "PLANNER" | "ADMIN";
 
 export default function Signup() {
   const [role, setRole] = useState<Role>("ATTENDEE");
@@ -15,7 +16,7 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { register, loading, error } = useRegister();
+  const { register } = useRegister();
   const navigate = useNavigate();
 
   async function onSubmit(e: React.FormEvent) {
@@ -46,6 +47,7 @@ export default function Signup() {
         address,
       });
       console.log("REGISTER RESPONSE:", res);
+      toast.success("Account created successfully! Please login.");
       navigate("/login");
     } catch (err: any) {
       const message = err?.response?.data?.message || "Registration failed";
@@ -55,7 +57,40 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="relative min-h-screen bg-gray-50 flex items-center justify-center p-4 overflow-hidden">
+      {/* Decorative Corner Squares */}
+      {/* Top Left */}
+      <div className="absolute top-10 left-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Top Right */}
+      <div className="absolute top-10 right-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Bottom Left */}
+      <div className="absolute bottom-10 left-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Bottom Right */}
+      <div className="absolute bottom-10 right-10 hidden md:block">
+        <div className="relative h-20 w-20">
+          <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
+          <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
+        </div>
+      </div>
+
       <div className="w-full max-w-md rounded-xl bg-white shadow border border-gray-200 p-6 sm:p-8">
         <h1 className="text-2xl font-bold text-gray-900">Create account</h1>
         <p className="text-sm text-gray-600 mt-1">
@@ -67,10 +102,11 @@ export default function Signup() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Account type
           </label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <RoleButton value="ATTENDEE" role={role} setRole={setRole} />
             <RoleButton value="VENDOR" role={role} setRole={setRole} />
             <RoleButton value="PLANNER" role={role} setRole={setRole} />
+            <RoleButton value="ADMIN" role={role} setRole={setRole} />
           </div>
         </div>
 

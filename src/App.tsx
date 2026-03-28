@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
 import AddServicePage from "./pages/AddServicesPage";
+import EditVendorServicePage from "./pages/EditVendorServicePage";
 import ServicePage from "./pages/ServicePage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import SignUp from "./features/auth/ui/SignUp";
@@ -13,6 +14,8 @@ import PaymentPage from "./pages/PaymentPage";
 import UpcomingEventsPage from "./pages/UpcomingEventsPage";
 import AttendeeProfilePage from "./pages/AttendeeProfilePage";
 import ChatBotInterface from "./pages/ChatBotInterface";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import { Toaster } from "react-hot-toast";
 
 import { RoleRoute } from "./features/auth/ui/RoleRoute";
 import { ProtectedRoute } from "./features/auth/ui/ProtectedRoute";
@@ -20,6 +23,7 @@ import { ProtectedRoute } from "./features/auth/ui/ProtectedRoute";
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
         {/* Public */}
         <Route
@@ -113,6 +117,17 @@ function App() {
           }
         />
 
+        <Route
+          path="/vendor/edit-service/:id"
+          element={
+            <RoleRoute allow={["VENDOR"]}>
+              <MainLayout>
+                <EditVendorServicePage />
+              </MainLayout>
+            </RoleRoute>
+          }
+        />
+
         {/*auth-only (any logged in user) */}
         <Route
           path="/payment"
@@ -151,6 +166,16 @@ function App() {
             <MainLayout>
               <AttendeeProfilePage />
             </MainLayout>
+          }
+        />
+
+        {/* Admin only */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <RoleRoute allow={["ADMIN"]}>
+              <AdminDashboardPage />
+            </RoleRoute>
           }
         />
       </Routes>

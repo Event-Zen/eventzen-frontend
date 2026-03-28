@@ -2,6 +2,10 @@ import React, { useMemo, useState, useEffect } from "react";
 import { Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getMyEvents, getEventById } from "../shared/api/eventClient";
+import GoogleCalendarButton from "../components/GoogleCalendarButton";
+import GoogleMeetButton from "../components/GoogleMeetButton";
+import { getMeApi, updateMeApi } from "../features/auth/api/auth.api";
+import { toast } from "react-hot-toast";
 
 type Planner = {
     name: string;
@@ -57,23 +61,58 @@ export default function PlannerProfilePage() {
     const navigate = useNavigate();
 
     // demo data
+    const user = useMemo(() => {
+        const raw = localStorage.getItem("user");
+        if (!raw) return null;
+        try {
+            return JSON.parse(raw);
+        } catch {
+            return null;
+        }
+    }, []);
+
     const initialPlanner: Planner = useMemo(
         () => ({
-            name: "Kasun Madushan",
-            email: "kasun@gmail.com",
+            name: user?.name || "Kasun Madushan",
+            email: user?.email || "kasun@gmail.com",
             mobile: "(+94) 77 1212654",
             location: "Weligama, Matara",
             avatarUrl: "", // optional
         }),
-        []
+        [user]
     );
 
     const [planner, setPlanner] = useState<Planner>(initialPlanner);
     const [draft, setDraft] = useState<Planner>(initialPlanner);
     const [isEditing, setIsEditing] = useState(false);
+    const [loadingProfile, setLoadingProfile] = useState(true);
 
     const [events, setEvents] = useState<PlannerEvent[]>([]);
     const [loadingEvents, setLoadingEvents] = useState(true);
+
+    useEffect(() => {
+        async function fetchProfile() {
+            try {
+                const res = await getMeApi();
+                if (res.user) {
+                    const profileData = {
+                        name: res.user.name || "",
+                        email: res.user.email || "",
+                        mobile: res.user.phone || "",
+                        location: res.user.address || "",
+                        avatarUrl: res.user.profileImageUrl || "",
+                    };
+                    setPlanner(profileData);
+                    setDraft(profileData);
+                }
+            } catch (err) {
+                console.error("Failed to fetch profile", err);
+            } finally {
+                setLoadingProfile(false);
+            }
+        }
+        fetchProfile();
+    }, []);
 
     useEffect(() => {
         async function fetchMyEvents() {
@@ -109,10 +148,42 @@ export default function PlannerProfilePage() {
         setIsEditing(false);
     };
 
-    const saveEdit = () => {
-        // TODO: API call here
-        setPlanner(draft);
-        setIsEditing(false);
+    const saveEdit = async () => {
+        try {
+            const res = await updateMeApi({
+                name: draft.name,
+                phone: draft.mobile,
+                address: draft.location,
+            });
+
+            if (res.user) {
+                const updatedPlanner = {
+                    name: res.user.name || "",
+                    email: res.user.email || "",
+                    mobile: res.user.phone || "",
+                    location: res.user.address || "",
+                    avatarUrl: res.user.profileImageUrl || "",
+                };
+                setPlanner(updatedPlanner);
+
+                // Update localStorage
+                const raw = localStorage.getItem("user");
+                if (raw) {
+                    const currentUser = JSON.parse(raw);
+                    localStorage.setItem("user", JSON.stringify({
+                        ...currentUser,
+                        name: res.user.name,
+                        email: res.user.email
+                    }));
+                }
+
+                toast.success("Profile updated successfully");
+            }
+            setIsEditing(false);
+        } catch (err) {
+            console.error("Failed to update profile", err);
+            toast.error("Failed to update profile");
+        }
     };
 
     const onEditEvent = async (id: string, isPublished: boolean) => {
@@ -159,17 +230,17 @@ export default function PlannerProfilePage() {
 
             sessionStorage.setItem("createEventForm", JSON.stringify(formData));
             sessionStorage.setItem("activeEventId", id);
-            
+
             if (Object.keys(vendorMap).length > 0) {
-                 sessionStorage.setItem("serviceSelections", JSON.stringify(vendorMap));
+                sessionStorage.setItem("serviceSelections", JSON.stringify(vendorMap));
             } else {
-                 sessionStorage.removeItem("serviceSelections");
+                sessionStorage.removeItem("serviceSelections");
             }
 
             navigate("/create-event", { state: { lockedVendors: isPublished } });
         } catch (error) {
             console.error("Failed to fetch event for edit", error);
-            alert("Could not load full event details.");
+            toast.error("Could not load full event details.");
         } finally {
             setLoadingEvents(false);
         }
@@ -179,11 +250,19 @@ export default function PlannerProfilePage() {
         navigate("/create-event");
     };
 
+    if (loadingProfile) {
+        return (
+            <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-100">
+                <div className="text-slate-500 font-medium animate-pulse">Loading your profile...</div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-100 px-4 py-10">
-            <div className="grid w-full max-w-6xl gap-12 lg:grid-cols-2">
+            <div className="grid w-full max-w-6xl items-start gap-12 lg:grid-cols-2">
                 {/* LEFT CARD - Planner Details */}
-                <div className="rounded-2xl bg-white p-8 shadow-sm">
+                <div className="rounded-2xl bg-white p-8 pb-0 shadow-sm">
                     {/* Header row */}
                     <div className="relative flex items-center justify-center pb-6">
                         <div className="flex items-center gap-4">
@@ -250,7 +329,7 @@ export default function PlannerProfilePage() {
                             <button
                                 type="button"
                                 className="rounded-md bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-700"
-                                onClick={() => alert("Saved (demo). Use edit icon to modify.")}
+                                onClick={() => toast.success("Saved (demo). Use edit icon to modify.")}
                             >
                                 Save Change
                             </button>
@@ -272,6 +351,16 @@ export default function PlannerProfilePage() {
                                 </button>
                             </div>
                         )}
+                    </div>
+
+                    {/* Google Calendar & Google Meet */}
+                    <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4 pb-8">
+                        <h3 className="mb-2 text-sm font-medium text-slate-900">Integration Tools</h3>
+                        <p className="mb-4 text-xs text-slate-600">Sync your events and schedule video meetings directly.</p>
+                        <div className="flex gap-3">
+                            <GoogleCalendarButton />
+                            <GoogleMeetButton />
+                        </div>
                     </div>
                 </div>
 

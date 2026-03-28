@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createEvent, updateEvent } from "../shared/api/eventClient";
+import ChatBotInterface from './ChatBotInterface';
 
 type EventType = "physical" | "virtual";
 
@@ -193,6 +194,8 @@ export default function CreateEventPage() {
   const lockedVendors = routerLocation.state?.lockedVendors;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const [form, setForm] = useState<FormState>(() => {
     const saved = sessionStorage.getItem("createEventForm");
@@ -494,75 +497,43 @@ export default function CreateEventPage() {
             </form>
           </div>
 
-          {/* Right side for smart insights */}
-          <div className="hidden lg:block lg:w-[420px] lg:self-start lg:sticky lg:top-28 h-fit pl-10">
-            <div className="space-y-6">
+
+          {/* Right side for smart insights & Chatbot */}
+          <div className="hidden lg:block lg:w-[420px] lg:self-start lg:sticky lg:top-28 h-[650px] pl-10 relative">
+            
+            {/* The standard insights - fades out when chat is open */}
+            <div className={`transition-all duration-300 w-full space-y-6 ${isChatOpen ? 'opacity-0 pointer-events-none absolute scale-95' : 'opacity-100 relative scale-100'}`}>
+              
               {/* Smart Insights Card */}
               <div className="rounded-2xl border bg-white shadow-sm p-6">
-                <h3 className="text-lg text-center font-semibold text-slate-900 mb-4">
-                  Smart Insights
-                </h3>
-
+                <h3 className="text-lg text-center font-semibold text-slate-900 mb-4">Smart Insights</h3>
                 <div className="space-y-4 text-sm text-slate-700">
-                  {/* Estimated Revenue */}
                   <div className="flex justify-between">
                     <span>Estimated Revenue</span>
                     <span className="font-semibold text-slate-900">
-                      {form.capacity && form.ticketPrice
-                        ? `LKR ${Number(form.capacity) * Number(form.ticketPrice)}`
-                        : "—"}
+                      {form.capacity && form.ticketPrice ? `LKR ${Number(form.capacity) * Number(form.ticketPrice)}` : "—"}
                     </span>
                   </div>
-
-                  {/* Event Duration */}
                   <div className="flex justify-between">
                     <span>Event Duration</span>
                     <span className="font-semibold text-slate-900">
-                      {form.startTime && form.endTime
-                        ? `${form.startTime} - ${form.endTime}`
-                        : "Not Set"}
+                      {form.startTime && form.endTime ? `${form.startTime} - ${form.endTime}` : "Not Set"}
                     </span>
                   </div>
-
-                  {/* Ticket Type */}
                   <div className="flex justify-between">
                     <span>Ticket Type</span>
                     <span className="font-semibold text-slate-900">
-                      {form.ticketPrice && Number(form.ticketPrice) > 0
-                        ? "Paid Event"
-                        : "Free Event"}
+                      {form.ticketPrice && Number(form.ticketPrice) > 0 ? "Paid Event" : "Free Event"}
                     </span>
                   </div>
-
-                  {/* Mode */}
                   <div className="flex justify-between">
                     <span>Event Mode</span>
-                    <span className="font-semibold text-slate-900 capitalize">
-                      {form.eventMode}
-                    </span>
+                    <span className="font-semibold text-slate-900 capitalize">{form.eventMode}</span>
                   </div>
-
-                  {/* Capacity Check */}
                   <div className="flex justify-between">
                     <span>Capacity Status</span>
-                    <span
-                      className={`font-semibold ${
-                        !form.capacity
-                          ? "text-slate-500"
-                          : Number(form.capacity) <= 100
-                            ? "text-green-600"
-                            : Number(form.capacity) <= 500
-                              ? "text-blue-600"
-                              : "text-red-600"
-                      }`}
-                    >
-                      {!form.capacity
-                        ? "Not Set"
-                        : Number(form.capacity) <= 100
-                          ? "Small Event"
-                          : Number(form.capacity) <= 500
-                            ? "Standard Event"
-                            : "Large Scale Event"}
+                    <span className={`font-semibold ${!form.capacity ? "text-slate-500" : Number(form.capacity) <= 100 ? "text-green-600" : Number(form.capacity) <= 500 ? "text-blue-600" : "text-red-600"}`}>
+                      {!form.capacity ? "Not Set" : Number(form.capacity) <= 100 ? "Small Event" : Number(form.capacity) <= 500 ? "Standard Event" : "Large Scale Event"}
                     </span>
                   </div>
                 </div>
@@ -570,89 +541,44 @@ export default function CreateEventPage() {
 
               {/* Smart Suggestion Box */}
               <div className="rounded-2xl border bg-violet-50 p-6">
-                <h4 className="text-sm text-center font-semibold text-violet-900 mb-4">
-                  Smart Suggestions
-                </h4>
-
+                <h4 className="text-sm text-center font-semibold text-violet-900 mb-4">Smart Suggestions</h4>
                 <div className="space-y-3 text-xs text-violet-800 leading-relaxed">
-                  {/* Pricing Suggestion */}
-                  <p>
-                    {form.ticketPrice && Number(form.ticketPrice) > 0
-                      ? "💡 Consider offering early bird discounts to increase initial registrations."
-                      : "💡 Free events usually attract higher engagement. You may monetize via sponsors or premium add-ons."}
-                  </p>
-
-                  {/* Capacity Suggestion */}
-                  {form.capacity && Number(form.capacity) <= 50 && (
-                    <p>
-                      👥 Small events perform better with personalized
-                      engagement and networking sessions.
-                    </p>
-                  )}
-
-                  {form.capacity && Number(form.capacity) > 300 && (
-                    <p>
-                      📣 Large capacity events benefit from strong marketing and
-                      early promotions.
-                    </p>
-                  )}
-
-                  {/* Virtual vs Physical */}
-                  {form.eventMode === "virtual" && (
-                    <p>
-                      🌐 Virtual events perform best between 6PM - 9PM and
-                      should include interactive elements like polls.
-                    </p>
-                  )}
-
-                  {form.eventMode === "physical" && (
-                    <p>
-                      📍 Physical events require clear parking and venue details
-                      to improve attendance.
-                    </p>
-                  )}
-
-                  {/* Time Suggestion */}
-                  {(!form.startTime || !form.endTime) && (
-                    <p>
-                      ⏰ Setting a clear start and end time increases trust and
-                      conversion rates.
-                    </p>
-                  )}
-
-                  {/* Weekend Suggestion */}
-                  {form.date && (
-                    <p>
-                      📅{" "}
-                      {form.date.getDay() === 0 || form.date.getDay() === 6
-                        ? "Weekend events generally attract higher attendance."
-                        : "Weekday events work best for professional audiences."}
-                    </p>
-                  )}
-
-                  {/* Event Type Suggestion */}
-                  {form.eventType !== "Selection" && (
-                    <p>
-                      🏷 {form.eventType} events perform better when you clearly
-                      state the benefits attendees will gain.
-                    </p>
-                  )}
+                  <p>{form.ticketPrice && Number(form.ticketPrice) > 0 ? "💡 Consider offering early bird discounts to increase initial registrations." : "💡 Free events usually attract higher engagement. You may monetize via sponsors or premium add-ons."}</p>
+                  {form.capacity && Number(form.capacity) <= 50 && <p>👥 Small events perform better with personalized engagement and networking sessions.</p>}
+                  {form.capacity && Number(form.capacity) > 300 && <p>📣 Large capacity events benefit from strong marketing and early promotions.</p>}
+                  {form.eventMode === "virtual" && <p>🌐 Virtual events perform best between 6PM - 9PM and should include interactive elements like polls.</p>}
+                  {form.eventMode === "physical" && <p>📍 Physical events require clear parking and venue details to improve attendance.</p>}
+                  {(!form.startTime || !form.endTime) && <p>⏰ Setting a clear start and end time increases trust and conversion rates.</p>}
+                  {form.date && <p>📅 {form.date.getDay() === 0 || form.date.getDay() === 6 ? "Weekend events generally attract higher attendance." : "Weekday events work best for professional audiences."}</p>}
+                  {form.eventType !== "Selection" && <p>🏷 {form.eventType} events perform better when you clearly state the benefits attendees will gain.</p>}
                 </div>
               </div>
             </div>
+
+            {/* Chatbot Overlay Component */}
+            <div className={`transition-all duration-300 absolute top-0 right-[-180px] z-50 h-[650px] w-[800px] origin-top-right ${isChatOpen ? 'opacity-100 pointer-events-auto scale-100 translate-y-0' : 'opacity-0 pointer-events-none scale-95 translate-y-4'}`}>
+                {isChatOpen && <ChatBotInterface onClose={() => setIsChatOpen(false)} />}
+            </div>
+
           </div>
+
+
+
         </div>
       </div>
 
-      <div className="sticky bottom-6 z-50 flex w-full justify-center pointer-events-none pb-6">
-        <button
-          type="button"
-          className="pointer-events-auto rounded-full bg-violet-700 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-violet-800 transition"
-          onClick={() => navigate("/chatbot")}
-        >
-          ✦ AI Support
-        </button>
-      </div>
+      {/* Hide the button if chat is open, or change its function */}
+      {!isChatOpen && (
+        <div className="sticky bottom-6 z-50 flex w-full justify-center pointer-events-none pb-6">
+          <button
+            type="button"
+            className="pointer-events-auto rounded-full bg-violet-700 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-violet-800 transition"
+            onClick={() => setIsChatOpen(true)}
+          >
+            ✦ AI Support
+          </button>
+        </div>
+      )}
     </div>
   );
 }

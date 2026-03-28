@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, ChevronDown, Calendar } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthUser } from "../features/auth/hooks/useAuthUser";
 import { profilePath } from "../features/auth/utils/rolePaths";
 import { listPublishedEvents } from "../shared/api/eventClient";
@@ -15,6 +15,7 @@ type SearchEvent = {
 const Header = () => {
   const { user, isAuthed, logout } = useAuthUser();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const isAttendee = user?.role === "ATTENDEE";
   const isPlanner = user?.role === "PLANNER";
@@ -70,7 +71,17 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Clear search query when navigating away from the find-events page
+  useEffect(() => {
+    if (location.pathname !== "/find-events") {
+      setSearchQuery("");
+      setShowDropdown(false);
+    }
+  }, [location.pathname]);
+
   function onLogout() {
+    setSearchQuery("");
+    setShowDropdown(false);
     logout();
     navigate("/login");
   }

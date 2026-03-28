@@ -1,4 +1,4 @@
-import { api } from "../../../lib/api";
+import { api } from "../../../shared/api/client";
 import type { RegisterRequest, RegisterResponse } from "../../../types/auth";
 
 export async function registerApi(payload: RegisterRequest) {

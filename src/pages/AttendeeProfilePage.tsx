@@ -1,7 +1,7 @@
-// src/pages/AttendeeProfilePage.tsx
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Pencil } from "lucide-react";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
+import { getMeApi, updateMeApi } from "../features/auth/api/auth.api";
 import { toast } from "react-hot-toast";
 
 type ProfileForm = {
@@ -67,6 +67,29 @@ export default function AttendeeProfilePage() {
       email: u.email || initialProfile.email,
     };
   });
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const res = await getMeApi();
+        if (res.user) {
+          setForm({
+            name: res.user.name || "",
+            email: res.user.email || "",
+            phone: res.user.phone || "",
+            location: res.user.address || "",
+            avatarUrl: res.user.profileImageUrl || initialProfile.avatarUrl,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile", err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    }
+    fetchProfile();
+  }, []);
   const [events] = useState<EventItem[]>(initialEvents);
 
   const avatarFallback = useMemo(() => initialsFromName(form.name), [form.name]);
@@ -75,10 +98,40 @@ export default function AttendeeProfilePage() {
     setForm((p) => ({ ...p, [key]: value }));
   }
 
-  function handleSave() {
-    // TODO: integrate API call (PATCH /profile) etc.
-    console.log("Saving profile:", form);
-    toast.success("Profile saved!");
+  async function handleSave() {
+    try {
+      const res = await updateMeApi({
+        name: form.name,
+        phone: form.phone,
+        address: form.location,
+      });
+
+      if (res.user) {
+        setForm({
+            name: res.user.name || "",
+            email: res.user.email || "",
+            phone: res.user.phone || "",
+            location: res.user.address || "",
+            avatarUrl: res.user.profileImageUrl || form.avatarUrl,
+        });
+
+        // Update localStorage
+        const raw = localStorage.getItem("user");
+        if (raw) {
+            const currentUser = JSON.parse(raw);
+            localStorage.setItem("user", JSON.stringify({
+                ...currentUser,
+                name: res.user.name,
+                email: res.user.email
+            }));
+        }
+
+        toast.success("Profile saved!");
+      }
+    } catch (err) {
+      console.error("Failed to save profile", err);
+      toast.error("Failed to save profile");
+    }
   }
 
   function handleEditEvent(id: string) {
@@ -91,6 +144,14 @@ export default function AttendeeProfilePage() {
     // TODO: navigate to create event page (e.g., /events/create)
     console.log("Create event");
     toast("Go to Create Event page");
+  }
+
+  if (loadingProfile) {
+    return (
+      <div className="min-h-screen w-full bg-slate-100 flex items-center justify-center">
+        <div className="text-slate-500 font-medium animate-pulse">Loading profile...</div>
+      </div>
+    );
   }
 
   return (

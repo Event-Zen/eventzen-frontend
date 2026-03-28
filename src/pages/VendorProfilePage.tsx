@@ -3,6 +3,8 @@ import { Pencil } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
 import { getMyVendorServices, listVendorServices } from "../shared/api/vendorClient";
+import { getMeApi, updateMeApi } from "../features/auth/api/auth.api";
+import { toast } from "react-hot-toast";
 
 type Vendor = {
   name: string;
@@ -162,10 +164,35 @@ export default function VendorProfilePage() {
   const [vendor, setVendor] = useState<Vendor>(initialVendor);
   const [draft, setDraft] = useState<Vendor>(initialVendor);
   const [isEditing, setIsEditing] = useState(false);
+  const [loadingProfile, setLoadingProfile] = useState(true);
 
   const [services, setServices] = useState<VendorService[]>([]);
   const [loadingServices, setLoadingServices] = useState(true);
   const [servicesError, setServicesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await getMeApi();
+        if (res.user) {
+          const profileData = {
+            name: res.user.name || "",
+            email: res.user.email || "",
+            mobile: res.user.phone || "",
+            location: res.user.address || "",
+            avatarUrl: res.user.profileImageUrl || "",
+          };
+          setVendor(profileData);
+          setDraft(profileData);
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile", err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -236,9 +263,41 @@ export default function VendorProfilePage() {
     setIsEditing(false);
   };
 
-  const saveEdit = () => {
-    setVendor(draft);
-    setIsEditing(false);
+  const saveEdit = async () => {
+    try {
+      const res = await updateMeApi({
+        name: draft.name,
+        phone: draft.mobile,
+        address: draft.location,
+      });
+
+      if (res.user) {
+        const updatedVendor = {
+          name: res.user.name || "",
+          email: res.user.email || "",
+          mobile: res.user.phone || "",
+          location: res.user.address || "",
+          avatarUrl: res.user.profileImageUrl || "",
+        };
+        setVendor(updatedVendor);
+        
+        // Update localStorage to keep basic info in sync
+        const currentUser = readAuthUser();
+        if (currentUser) {
+            localStorage.setItem("user", JSON.stringify({
+                ...currentUser,
+                name: res.user.name,
+                email: res.user.email
+            }));
+        }
+        
+        toast.success("Profile updated successfully");
+      }
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Failed to update profile", err);
+      toast.error("Failed to update profile");
+    }
   };
 
   const onEditService = (id: string) => {
@@ -257,6 +316,14 @@ export default function VendorProfilePage() {
 
     return initials.toUpperCase();
   };
+
+  if (loadingProfile) {
+    return (
+      <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-50">
+        <div className="text-slate-500 font-medium animate-pulse">Loading profile...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-140px)] bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-10">

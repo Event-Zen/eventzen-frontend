@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getMyEvents, getEventById } from "../shared/api/eventClient";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
 import GoogleMeetButton from "../components/GoogleMeetButton";
+import { getMeApi, updateMeApi } from "../features/auth/api/auth.api";
 import { toast } from "react-hot-toast";
 
 type Planner = {
@@ -84,9 +85,34 @@ export default function PlannerProfilePage() {
     const [planner, setPlanner] = useState<Planner>(initialPlanner);
     const [draft, setDraft] = useState<Planner>(initialPlanner);
     const [isEditing, setIsEditing] = useState(false);
+    const [loadingProfile, setLoadingProfile] = useState(true);
 
     const [events, setEvents] = useState<PlannerEvent[]>([]);
     const [loadingEvents, setLoadingEvents] = useState(true);
+
+    useEffect(() => {
+        async function fetchProfile() {
+            try {
+                const res = await getMeApi();
+                if (res.user) {
+                    const profileData = {
+                        name: res.user.name || "",
+                        email: res.user.email || "",
+                        mobile: res.user.phone || "",
+                        location: res.user.address || "",
+                        avatarUrl: res.user.profileImageUrl || "",
+                    };
+                    setPlanner(profileData);
+                    setDraft(profileData);
+                }
+            } catch (err) {
+                console.error("Failed to fetch profile", err);
+            } finally {
+                setLoadingProfile(false);
+            }
+        }
+        fetchProfile();
+    }, []);
 
     useEffect(() => {
         async function fetchMyEvents() {
@@ -122,10 +148,42 @@ export default function PlannerProfilePage() {
         setIsEditing(false);
     };
 
-    const saveEdit = () => {
-        // TODO: API call here
-        setPlanner(draft);
-        setIsEditing(false);
+    const saveEdit = async () => {
+        try {
+            const res = await updateMeApi({
+                name: draft.name,
+                phone: draft.mobile,
+                address: draft.location,
+            });
+
+            if (res.user) {
+                const updatedPlanner = {
+                    name: res.user.name || "",
+                    email: res.user.email || "",
+                    mobile: res.user.phone || "",
+                    location: res.user.address || "",
+                    avatarUrl: res.user.profileImageUrl || "",
+                };
+                setPlanner(updatedPlanner);
+
+                // Update localStorage
+                const raw = localStorage.getItem("user");
+                if (raw) {
+                    const currentUser = JSON.parse(raw);
+                    localStorage.setItem("user", JSON.stringify({
+                        ...currentUser,
+                        name: res.user.name,
+                        email: res.user.email
+                    }));
+                }
+
+                toast.success("Profile updated successfully");
+            }
+            setIsEditing(false);
+        } catch (err) {
+            console.error("Failed to update profile", err);
+            toast.error("Failed to update profile");
+        }
     };
 
     const onEditEvent = async (id: string, isPublished: boolean) => {
@@ -191,6 +249,14 @@ export default function PlannerProfilePage() {
     const onCreate = () => {
         navigate("/create-event");
     };
+
+    if (loadingProfile) {
+        return (
+            <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-100">
+                <div className="text-slate-500 font-medium animate-pulse">Loading your profile...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-[calc(100vh-140px)] flex items-center justify-center bg-slate-100 px-4 py-10">

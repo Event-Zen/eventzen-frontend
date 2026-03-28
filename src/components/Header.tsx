@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthUser } from "../features/auth/hooks/useAuthUser";
@@ -10,11 +11,28 @@ const Header = () => {
   const isAttendee = user?.role === "ATTENDEE";
   const isPlanner = user?.role === "PLANNER";
   const isAdmin = user?.role === "ADMIN";
+  const [searchQuery, setSearchQuery] = useState("");
 
   function onLogout() {
     logout();
     navigate("/login");
   }
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/find-events?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate("/find-events");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <header className="w-full bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-y-4">
@@ -35,16 +53,25 @@ const Header = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-full sm:max-w-[400px]">
+        <form
+          onSubmit={handleSearch}
+          className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-full sm:max-w-[400px]"
+        >
           <input
             type="text"
             placeholder="Search events"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="bg-transparent outline-none flex-1 text-sm"
           />
-          <button className="bg-blue-500 p-2 rounded-full text-white hover:bg-blue-600 transition">
+          <button
+            type="submit"
+            className="bg-blue-500 p-2 rounded-full text-white hover:bg-blue-600 transition"
+          >
             <Search size={18} />
           </button>
-        </div>
+        </form>
 
         {/* Navigation */}
         <nav className="flex flex-wrap items-center gap-4 lg:gap-6 text-sm font-medium text-gray-700">

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createVendorService } from "../shared/api/vendorClient";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { getVendorServiceById, updateVendorService } from "../shared/api/vendorClient";
 import { toast } from "react-hot-toast";
 
 type ServiceForm = {
@@ -10,6 +10,7 @@ type ServiceForm = {
   price: string;
   vendorEmail: string;
   vendorPhone: string;
+  isActive: boolean;
 };
 
 const SERVICE_CATEGORIES = [
@@ -19,31 +20,49 @@ const SERVICE_CATEGORIES = [
   { id: "food", title: "Food & Beverages" },
 ];
 
-export default function AddServicePage() {
+export default function EditVendorServicePage() {
   const navigate = useNavigate();
-
-  const getLoggedInVendorEmail = () => {
-    const rawUser = localStorage.getItem("user");
-    if (!rawUser) return "";
-    try {
-      const parsed = JSON.parse(rawUser);
-      return parsed?.email || "";
-    } catch {
-      return "";
-    }
-  };
-
-  const loggedInVendorEmail = getLoggedInVendorEmail();
+  const { id } = useParams<{ id: string }>();
 
   const [form, setForm] = useState<ServiceForm>({
     serviceName: "",
     serviceType: "",
     description: "",
     price: "",
-    vendorEmail: loggedInVendorEmail,
+    vendorEmail: "",
     vendorPhone: "",
+    isActive: true,
   });
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchService = async () => {
+      try {
+        const res = await getVendorServiceById(id);
+        if (res.success && res.data) {
+          const srv = res.data;
+          setForm({
+            serviceName: srv.serviceName || "",
+            serviceType: srv.category || "",
+            description: srv.description || "",
+            price: srv.price ? srv.price.toString() : "",
+            vendorEmail: srv.vendorEmail || "",
+            vendorPhone: srv.vendorPhone || "",
+            isActive: srv.isActive !== false,
+          });
+        }
+      } catch (err: any) {
+        console.error("Failed to load service details", err);
+        toast.error("Failed to load service details");
+        navigate("/vendor-profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchService();
+  }, [id, navigate]);
 
   const setField = <K extends keyof ServiceForm>(key: K, value: ServiceForm[K]) => {
     setForm((p) => ({ ...p, [key]: value }));
@@ -53,58 +72,61 @@ export default function AddServicePage() {
     navigate("/vendor-profile");
   };
 
-  const onAdd = async (e: React.FormEvent) => {
+  const onUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!id) return;
+
     setSubmitting(true);
 
     try {
-      await createVendorService({
+      await updateVendorService(id, {
         serviceName: form.serviceName,
         category: form.serviceType,
         description: form.description,
         price: Number(form.price),
-        vendorEmail: form.vendorEmail || loggedInVendorEmail,
+        vendorEmail: form.vendorEmail,
         vendorPhone: form.vendorPhone,
-        availableDates: [new Date()], // Just defaulting to now for creation
+        isActive: form.isActive,
       });
-      toast.success("Service added successfully.");
+      toast.success("Service updated successfully.");
       navigate("/vendor-profile");
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || err.message || "Failed to add service");
+      toast.error(err.response?.data?.message || err.message || "Failed to update service");
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-gray-600 font-medium">Loading service details...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen bg-gray-50 flex items-center justify-center p-4 overflow-hidden">
       {/* Decorative Corner Squares */}
-      {/* Top Left */}
       <div className="absolute top-10 left-10 hidden md:block">
         <div className="relative h-20 w-20">
           <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
           <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
         </div>
       </div>
-
-      {/* Top Right */}
       <div className="absolute top-10 right-10 hidden md:block">
         <div className="relative h-20 w-20">
           <div className="absolute h-20 w-20 border-2 border-blue-400 rounded-lg"></div>
           <div className="absolute top-6 left-6 h-20 w-20 border-2 border-blue-300 rounded-lg"></div>
         </div>
       </div>
-
-      {/* Bottom Left */}
       <div className="absolute bottom-10 left-10 hidden md:block">
         <div className="relative h-20 w-20">
           <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
           <div className="absolute top-6 left-6 h-20 w-20 border-2 border-orange-300 rounded-lg"></div>
         </div>
       </div>
-
-      {/* Bottom Right */}
       <div className="absolute bottom-10 right-10 hidden md:block">
         <div className="relative h-20 w-20">
           <div className="absolute h-20 w-20 border-2 border-orange-400 rounded-lg"></div>
@@ -113,17 +135,17 @@ export default function AddServicePage() {
       </div>
 
       {/* Centered Card */}
-      <div className="w-full max-w-md rounded-xl bg-white shadow border border-gray-200 p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-gray-900">Add Service</h1>
-        <p className="text-sm text-gray-600 mt-1">List a new service for your vendor profile</p>
+      <div className="w-full max-w-md rounded-xl bg-white shadow border border-gray-200 p-6 sm:p-8 relative z-10">
+        <h1 className="text-2xl font-bold text-gray-900">Edit Service</h1>
+        <p className="text-sm text-gray-600 mt-1">Update details for your service</p>
 
-        <form onSubmit={onAdd} className="mt-6 space-y-4">
+        <form onSubmit={onUpdate} className="mt-6 space-y-4">
           <Field label="Service Name">
             <input
               required
               value={form.serviceName}
               onChange={(e) => setField("serviceName", e.target.value)}
-              className="input"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="e.g. Premium DJ Setup"
             />
           </Field>
@@ -133,7 +155,7 @@ export default function AddServicePage() {
               required
               value={form.serviceType}
               onChange={(e) => setField("serviceType", e.target.value)}
-              className="input"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
             >
               <option value="">Select a service category</option>
               {SERVICE_CATEGORIES.map((cat) => (
@@ -149,7 +171,7 @@ export default function AddServicePage() {
               required
               value={form.description}
               onChange={(e) => setField("description", e.target.value)}
-              className="input"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="Describe your service"
             />
           </Field>
@@ -159,7 +181,7 @@ export default function AddServicePage() {
               required
               value={form.price}
               onChange={(e) => setField("price", e.target.value)}
-              className="input"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="0"
               type="number"
               min="0"
@@ -172,9 +194,8 @@ export default function AddServicePage() {
               type="email"
               value={form.vendorEmail}
               onChange={(e) => setField("vendorEmail", e.target.value)}
-              className="input"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="your.email@example.com"
-              readOnly={!!loggedInVendorEmail}
             />
           </Field>
 
@@ -184,10 +205,23 @@ export default function AddServicePage() {
               type="tel"
               value={form.vendorPhone}
               onChange={(e) => setField("vendorPhone", e.target.value)}
-              className="input"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="e.g. 077 123 4567"
             />
           </Field>
+          
+          <div className="flex items-center gap-2 pt-2">
+            <input
+              type="checkbox"
+              id="isActive"
+              checked={form.isActive}
+              onChange={(e) => setField("isActive", e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+              Active Service
+            </label>
+          </div>
 
           <div className="pt-2 flex gap-3">
             <button
@@ -203,7 +237,7 @@ export default function AddServicePage() {
               disabled={submitting}
               className="flex-1 rounded-lg bg-blue-600 text-white py-2.5 font-semibold hover:bg-blue-700 transition disabled:opacity-50"
             >
-              {submitting ? "Adding..." : "Add Service"}
+              {submitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

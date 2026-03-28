@@ -1,6 +1,8 @@
-// src/pages/AttendeeProfilePage.tsx
-import React, { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Pencil } from "lucide-react";
+import GoogleCalendarButton from "../components/GoogleCalendarButton";
+import { getMeApi, updateMeApi } from "../features/auth/api/auth.api";
+import { toast } from "react-hot-toast";
 
 type ProfileForm = {
   name: string;
@@ -51,7 +53,43 @@ function initialsFromName(name: string) {
 }
 
 export default function AttendeeProfilePage() {
-  const [form, setForm] = useState<ProfileForm>(initialProfile);
+  const [form, setForm] = useState<ProfileForm>(() => {
+    const raw = localStorage.getItem("user");
+    let u: any = {};
+    if (raw) {
+      try {
+        u = JSON.parse(raw);
+      } catch {}
+    }
+    return {
+      ...initialProfile,
+      name: u.name || initialProfile.name,
+      email: u.email || initialProfile.email,
+    };
+  });
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const res = await getMeApi();
+        if (res.user) {
+          setForm({
+            name: res.user.name || "",
+            email: res.user.email || "",
+            phone: res.user.phone || "",
+            location: res.user.address || "",
+            avatarUrl: res.user.profileImageUrl || initialProfile.avatarUrl,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile", err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    }
+    fetchProfile();
+  }, []);
   const [events] = useState<EventItem[]>(initialEvents);
 
   const avatarFallback = useMemo(() => initialsFromName(form.name), [form.name]);
@@ -60,22 +98,60 @@ export default function AttendeeProfilePage() {
     setForm((p) => ({ ...p, [key]: value }));
   }
 
-  function handleSave() {
-    // TODO: integrate API call (PATCH /profile) etc.
-    console.log("Saving profile:", form);
-    alert("Profile saved!");
+  async function handleSave() {
+    try {
+      const res = await updateMeApi({
+        name: form.name,
+        phone: form.phone,
+        address: form.location,
+      });
+
+      if (res.user) {
+        setForm({
+            name: res.user.name || "",
+            email: res.user.email || "",
+            phone: res.user.phone || "",
+            location: res.user.address || "",
+            avatarUrl: res.user.profileImageUrl || form.avatarUrl,
+        });
+
+        // Update localStorage
+        const raw = localStorage.getItem("user");
+        if (raw) {
+            const currentUser = JSON.parse(raw);
+            localStorage.setItem("user", JSON.stringify({
+                ...currentUser,
+                name: res.user.name,
+                email: res.user.email
+            }));
+        }
+
+        toast.success("Profile saved!");
+      }
+    } catch (err) {
+      console.error("Failed to save profile", err);
+      toast.error("Failed to save profile");
+    }
   }
 
   function handleEditEvent(id: string) {
     // TODO: navigate to edit event page (e.g., /events/:id/edit)
     console.log("Edit event:", id);
-    alert(`Edit event: ${id}`);
+    toast(`Edit event: ${id}`);
   }
 
   function handleCreateEvent() {
     // TODO: navigate to create event page (e.g., /events/create)
     console.log("Create event");
-    alert("Go to Create Event page");
+    toast("Go to Create Event page");
+  }
+
+  if (loadingProfile) {
+    return (
+      <div className="min-h-screen w-full bg-slate-100 flex items-center justify-center">
+        <div className="text-slate-500 font-medium animate-pulse">Loading profile...</div>
+      </div>
+    );
   }
 
   return (
@@ -102,7 +178,7 @@ export default function AttendeeProfilePage() {
               <button
                 type="button"
                 className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm"
-                onClick={() => alert("Avatar edit (optional)")}
+                onClick={() => toast("Avatar edit (optional)")}
                 aria-label="Edit avatar"
               >
                 <Pencil size={12} />
@@ -163,6 +239,15 @@ export default function AttendeeProfilePage() {
               >
                 Save Change
               </button>
+            </div>
+
+            {/* Reminders & Calendar */}
+            <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Reminders & Calendar</h3>
+              <p className="text-xs text-gray-600 mb-3">
+                Open Google Calendar to add reminders for your upcoming events.
+              </p>
+              <GoogleCalendarButton />
             </div>
           </div>
         </div>

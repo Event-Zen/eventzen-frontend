@@ -135,11 +135,7 @@ export default function AttendeeProfilePage() {
     }
   }
 
-  function handleEditEvent(id: string) {
-    // TODO: navigate to edit event page (e.g., /events/:id/edit)
-    console.log("Edit event:", id);
-    toast(`Edit event: ${id}`);
-  }
+
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -152,11 +148,7 @@ export default function AttendeeProfilePage() {
     }
   };
 
-  function handleCreateEvent() {
-    // TODO: navigate to create event page (e.g., /events/create)
-    console.log("Create event");
-    toast("Go to Create Event page");
-  }
+
 
   if (loadingProfile) {
     return (
@@ -187,13 +179,13 @@ export default function AttendeeProfilePage() {
               )}
 
               {/* small edit icon circle */}
-              <label
-                className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm cursor-pointer"
+              <div
+                className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm cursor-pointer hover:bg-gray-50 overflow-hidden"
                 aria-label="Edit avatar"
               >
-                <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
-                <Pencil size={12} className="text-gray-600" />
-              </label>
+                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" accept="image/*" onChange={handleAvatarChange} />
+                <Pencil size={12} className="text-gray-600 pointer-events-none" />
+              </div>
             </div>
 
             <div className="leading-tight">
@@ -275,14 +267,7 @@ export default function AttendeeProfilePage() {
                 key={ev.id}
                 className="relative rounded-lg bg-gray-200/80 p-4"
               >
-                <button
-                  type="button"
-                  className="absolute top-3 right-3 text-gray-700 hover:text-gray-900"
-                  onClick={() => handleEditEvent(ev.id)}
-                  aria-label={`Edit ${ev.title}`}
-                >
-                  <Pencil size={16} />
-                </button>
+
 
                 <div className="font-semibold text-gray-900 mb-2">
                   {ev.title}
@@ -307,13 +292,7 @@ export default function AttendeeProfilePage() {
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={handleCreateEvent}
-            className="mt-6 inline-flex items-center justify-center rounded-md bg-[#7A0B0B] px-6 py-2 text-white font-medium shadow-sm hover:opacity-95 active:opacity-90"
-          >
-            Create
-          </button>
+
         </div>
       </div>
     </div>

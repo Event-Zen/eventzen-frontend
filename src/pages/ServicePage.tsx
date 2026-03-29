@@ -325,8 +325,18 @@ const [isChatOpen, setIsChatOpen] = useState(false);
   };
 
   return (
-    <div className="w-full px-6 py-6">
-      <h1 className="mb-4 text-xl font-bold text-slate-900">Select Services</h1>
+    <div className="w-full px-6 py-6 relative min-h-[calc(100vh-80px)]">
+      
+      {/* Top Header with Back Button */}
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900">Select Services</h1>
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition shadow-sm"
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_320px]">
         {/* LEFT */}
@@ -494,9 +504,18 @@ const [isChatOpen, setIsChatOpen] = useState(false);
               <button
                 type="button"
                 onClick={downloadBudgetReport}
-                className="mt-4 w-full rounded-lg bg-blue-600 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 transition"
+                className="mt-4 w-full rounded-lg border-2 border-blue-600 bg-white py-2 text-xs font-bold text-blue-600 hover:bg-blue-50 transition"
               >
-                Download Report
+                Download PDF Report
+              </button>
+
+              {/* MOVED FINISH BUTTON HERE */}
+              <button
+                onClick={onFinish}
+                disabled={saving}
+                className="mt-3 w-full rounded-lg bg-blue-600 py-3 text-sm font-bold text-white shadow-lg hover:bg-blue-700 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 transition-all"
+              >
+                {saving ? "Saving..." : "Complete & Proceed"}
               </button>
             </div>
           </div>
@@ -509,35 +528,18 @@ const [isChatOpen, setIsChatOpen] = useState(false);
         </aside>
       </div>
 
-      {/* Bottom buttons */}
-      <div className="mt-6 flex items-center justify-between">
-        <button
-          onClick={() => navigate("/")}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
-        >
-          Back
-        </button>
-
-        <div className="flex items-center gap-3">
+      {/* Floating AI Support Button */}
+      {!isChatOpen && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
           <button
-            onClick={onFinish}
-            disabled={saving}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-50"
+            onClick={() => setIsChatOpen(true)}
+            className="pointer-events-auto rounded-full bg-violet-600 px-8 py-3.5 text-sm font-bold text-white shadow-[0_8px_30px_rgb(124,58,237,0.4)] hover:bg-violet-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 border border-white/20"
           >
-            {saving ? "Saving..." : "Finish"}
+            <span className="text-lg leading-none">✦</span> AI Support
           </button>
-
-          {/* Hide the button when Chat is open */}
-          {!isChatOpen && (
-            <button
-              onClick={() => setIsChatOpen(true)}
-              className="rounded-full bg-violet-600 px-4 py-2 text-sm font-bold text-white shadow hover:bg-violet-700 transition-opacity duration-300"
-            >
-               ✦ AI Support
-            </button>
-          )}
         </div>
-      </div>
+      )}
+
     </div>
   );
 };

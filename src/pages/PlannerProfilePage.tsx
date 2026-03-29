@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getMyEvents, getEventById } from "../shared/api/eventClient";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
@@ -8,6 +8,7 @@ import FacebookPromotionButton from "../components/FacebookPromotionButton";
 import InstagramPromotionButton from "../components/InstagramPromotionButton";
 import { getMeApi, updateMeApi } from "../features/auth/api/auth.api";
 import { toast } from "react-hot-toast";
+import { getVendorServiceById } from "../shared/api/vendorClient";
 
 type Planner = {
   name: string;
@@ -24,6 +25,7 @@ type PlannerEvent = {
   progressLabel: string;
   progressColor: "green" | "blue";
   vendorsCount?: number;
+  selectedVendors?: any[];
 };
 
 function FieldRow({
@@ -105,6 +107,10 @@ export default function PlannerProfilePage() {
   const [events, setEvents] = useState<PlannerEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
 
+  const [activeVendorModalEvent, setActiveVendorModalEvent] = useState<PlannerEvent | null>(null);
+  const [vendorDetailsList, setVendorDetailsList] = useState<any[]>([]);
+  const [loadingVendors, setLoadingVendors] = useState(false);
+
   useEffect(() => {
     async function fetchProfile() {
       try {
@@ -146,6 +152,7 @@ export default function PlannerProfilePage() {
           progressLabel: ev.status === "published" ? "Published" : "Draft",
           progressColor: ev.status === "published" ? "green" : "blue",
           vendorsCount: ev.selectedVendors ? ev.selectedVendors.length : 0,
+          selectedVendors: ev.selectedVendors || [],
         }));
         mapped.reverse(); // newest first
         setEvents(mapped);
@@ -157,6 +164,32 @@ export default function PlannerProfilePage() {
     }
     fetchMyEvents();
   }, []);
+
+  const onOpenVendorModal = async (ev: PlannerEvent) => {
+    if (!ev.selectedVendors || ev.selectedVendors.length === 0) return;
+    setActiveVendorModalEvent(ev);
+    setLoadingVendors(true);
+    try {
+      const details = await Promise.all(
+        ev.selectedVendors.map(async (v) => {
+          if (!v.serviceId) return null;
+          try {
+            const res = await getVendorServiceById(v.serviceId);
+            return (res as any)?.data ?? res;
+          } catch (err) {
+            console.error("Failed to fetch vendor service", err);
+            return null;
+          }
+        })
+      );
+      setVendorDetailsList(details.filter((d) => d !== null));
+    } catch (err) {
+      console.error("Error loading vendor details", err);
+      toast.error("Failed to load vendor details");
+    } finally {
+      setLoadingVendors(false);
+    }
+  };
 
   const startEdit = () => {
     setDraft(planner);
@@ -473,9 +506,13 @@ export default function PlannerProfilePage() {
                       ev.vendorsCount > 0 && (
                         <div className="text-slate-600 font-medium tracking-wide">
                           Vendors Hired:{" "}
-                          <span className="text-slate-900 font-bold">
+                          <button
+                            type="button"
+                            onClick={() => onOpenVendorModal(ev)}
+                            className="text-slate-900 font-bold underline hover:text-blue-600 hover:underline-offset-2 transition-all"
+                          >
                             {ev.vendorsCount}
-                          </span>
+                          </button>
                         </div>
                       )}
                   </div>
@@ -493,6 +530,69 @@ export default function PlannerProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Vendor Details Popup Modal */}
+      {activeVendorModalEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl relative max-h-[90vh] overflow-y-auto transform transition-all">
+            <button
+              onClick={() => setActiveVendorModalEvent(null)}
+              className="absolute right-4 top-4 rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <h3 className="text-xl font-bold text-slate-900 mb-4 pr-10">
+              Hired Vendors for <span className="text-blue-600 font-semibold">{activeVendorModalEvent.title}</span>
+            </h3>
+
+            {loadingVendors ? (
+              <div className="flex flex-col items-center justify-center py-10">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+                <p className="animate-pulse text-sm font-semibold text-slate-500">
+                  Loading vendor details...
+                </p>
+              </div>
+            ) : vendorDetailsList.length === 0 ? (
+              <div className="flex justify-center py-10 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-sm font-medium text-slate-500">
+                  No detailed vendor information found.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {vendorDetailsList.map((vendor, idx) => (
+                  <div key={idx} className="rounded-xl border border-slate-200 bg-slate-50 shadow-sm p-5 hover:border-slate-300 hover:shadow-md transition-all">
+                    <div className="font-bold text-slate-800 text-lg mb-1 flex items-center justify-between">
+                      {vendor.vendorName || vendor.serviceName || "Vendor"}
+                    </div>
+                    {(vendor.vendorName && vendor.serviceName) && (
+                      <div className="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-3 bg-blue-100 inline-block px-2 py-1 rounded-md">
+                        {vendor.serviceName}
+                      </div>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4 text-sm mt-3 pt-3 border-t border-slate-200/60">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs font-semibold text-slate-500 uppercase">Email</span>
+                        <span className="text-slate-800 break-all">{vendor.vendorEmail || "N/A"}</span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs font-semibold text-slate-500 uppercase">Phone</span>
+                        <span className="text-slate-800">{vendor.vendorPhone || "N/A"}</span>
+                      </div>
+                      <div className="sm:col-span-2 flex flex-col gap-1 mt-1">
+                        <span className="text-xs font-semibold text-slate-500 uppercase">Price</span>
+                        <span className="text-slate-900 font-bold bg-green-100 w-fit px-3 py-1 rounded-md text-green-800">
+                          {vendor.currency || "USD"} {vendor.price?.toLocaleString() || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

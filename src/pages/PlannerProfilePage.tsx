@@ -130,8 +130,14 @@ export default function PlannerProfilePage() {
   useEffect(() => {
     async function fetchMyEvents() {
       try {
-        const fetched = await getMyEvents();
-        const mapped: PlannerEvent[] = (fetched || []).map((ev: any) => ({
+        const response = await getMyEvents();
+        const fetched = Array.isArray(response)
+          ? response
+          : Array.isArray((response as any)?.data)
+            ? (response as any).data
+            : [];
+
+        const mapped: PlannerEvent[] = fetched.map((ev: any) => ({
           id: ev._id,
           title: ev.title,
           description: ev.description || "No description provided",
@@ -205,7 +211,7 @@ export default function PlannerProfilePage() {
     try {
       setLoadingEvents(true);
       const response = await getEventById(id);
-      const ev = response.data;
+      const ev = (response as any)?.data ?? response;
       if (!ev) throw new Error("Event not found");
 
       let cleanDesc = ev.description || "";

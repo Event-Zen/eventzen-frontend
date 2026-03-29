@@ -19,8 +19,8 @@ export const createEvent = async (payload: any) => {
   return response.data;
 };
 
-export const listPublishedEvents = async () => {
-  const response = await eventApi.get("/");
+export const listPublishedEvents = async (params?: Record<string, any>) => {
+  const response = await eventApi.get("/", { params });
   return response.data;
 };
 

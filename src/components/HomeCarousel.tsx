@@ -47,16 +47,11 @@ const HomeCarousel = () => {
   useEffect(() => {
     async function loadEvents() {
       try {
-        const response = await listPublishedEvents();
+        const response = await listPublishedEvents({ limit: 5, sortBy: "createdAt:desc" });
         const data = response.data || [];
         if (data.length > 0) {
-          // Sort by newest first, take top 5
-          const sorted = [...data].sort((a: any, b: any) => 
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-          const top5 = sorted.slice(0, 5);
-          
-          const newSlides: Slide[] = top5.map((ev: any, i: number) => {
+          // The backend already sorts and limits to 5
+          const newSlides: Slide[] = data.map((ev: any, i: number) => {
             let desc = ev.description || "Join us for this exciting event.";
             if (desc.includes(" | Capacity: ")) {
               desc = desc.split(" | ")[0]; // clean up backend string

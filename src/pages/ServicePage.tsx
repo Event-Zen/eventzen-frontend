@@ -330,12 +330,6 @@ const [isChatOpen, setIsChatOpen] = useState(false);
       {/* Top Header with Back Button */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">Select Services</h1>
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition shadow-sm"
-        >
-          ← Back to Dashboard
-        </button>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_320px]">
@@ -530,12 +524,13 @@ const [isChatOpen, setIsChatOpen] = useState(false);
 
       {/* Floating AI Support Button */}
       {!isChatOpen && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+        <div className="sticky bottom-6 z-50 flex w-full justify-center pointer-events-none pb-6">
           <button
+            type="button"
+            className="pointer-events-auto rounded-full bg-violet-700 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-violet-800 transition"
             onClick={() => setIsChatOpen(true)}
-            className="pointer-events-auto rounded-full bg-violet-600 px-8 py-3.5 text-sm font-bold text-white shadow-[0_8px_30px_rgb(124,58,237,0.4)] hover:bg-violet-700 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 border border-white/20"
           >
-            <span className="text-lg leading-none">✦</span> AI Support
+            ✦ AI Support
           </button>
         </div>
       )}

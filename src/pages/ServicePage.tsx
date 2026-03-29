@@ -4,6 +4,7 @@ import { selectVendorsApi } from "../shared/api/eventClient";
 import { listVendorServices } from "../shared/api/vendorClient";
 import { jsPDF } from "jspdf";
 import { toast } from "react-hot-toast";
+import ChatBotInterface from './ChatBotInterface';
 
 type ServiceItem = {
   id: string;
@@ -27,6 +28,8 @@ const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [saving, setSaving] = useState(false);
+
+const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Get eventId from router state or sessionStorage
   const eventId: string | null =
@@ -393,106 +396,116 @@ const ServicesPage: React.FC = () => {
           ))}
         </div>
 
-        {/* RIGHT (Budget report) */}
-        <aside className="hidden lg:block lg:self-start lg:sticky lg:top-28 h-fit">
-          <div className="rounded-xl bg-white shadow border border-gray-200 p-5 sm:p-6">
-            <h3 className="text-lg font-bold text-gray-900">Budget Report</h3>
-            <p className="mt-1 text-xs text-gray-600">Review selected and additional costs.</p>
+        {/* RIGHT (Budget report & Chatbot) */}
+        <aside className="hidden lg:block lg:self-start lg:sticky lg:top-28 h-[650px] relative z-40">
+          
+          {/* The standard Budget Report - fades out when chat is open */}
+          <div className={`transition-all duration-300 w-full ${isChatOpen ? 'opacity-0 pointer-events-none absolute scale-95' : 'opacity-100 relative scale-100'}`}>
+            <div className="rounded-xl bg-white shadow border border-gray-200 p-5 sm:p-6">
+              <h3 className="text-lg font-bold text-gray-900">Budget Report</h3>
+              <p className="mt-1 text-xs text-gray-600">Review selected and additional costs.</p>
 
-            <div className="mt-4 mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
-              <div className="mb-2 text-xs font-semibold text-gray-800">
-                Selected Services
+              <div className="mt-4 mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
+                <div className="mb-2 text-xs font-semibold text-gray-800">
+                  Selected Services
+                </div>
+
+                {selectedItems.length === 0 ? (
+                  <div className="text-xs text-gray-500">No services selected.</div>
+                ) : (
+                  <div className="space-y-1">
+                    {selectedItems.map((it) => (
+                      <div
+                        key={it.id}
+                        className="flex items-center justify-between gap-3 text-xs text-gray-700"
+                      >
+                        <div className="truncate">{it.name}</div>
+                        <div className="font-semibold text-gray-900">{LKR(it.price)}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="my-2 h-px bg-gray-200" />
+                <div className="flex items-center justify-between text-xs font-semibold text-gray-800">
+                  <div>Total</div>
+                  <div className="text-gray-900">{LKR(selectedTotal)}</div>
+                </div>
               </div>
 
-              {selectedItems.length === 0 ? (
-                <div className="text-xs text-gray-500">No services selected.</div>
-              ) : (
-                <div className="space-y-1">
-                  {selectedItems.map((it) => (
+              <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
+                <div className="mb-2 text-xs font-semibold text-gray-800">Other Services</div>
+
+                <div className="space-y-2">
+                  {otherServices.map((it, idx) => (
                     <div
-                      key={it.id}
-                      className="flex items-center justify-between gap-3 text-xs text-gray-700"
+                      key={idx}
+                      className="flex items-center gap-2 text-xs"
                     >
-                      <div className="truncate">{it.name}</div>
-                      <div className="font-semibold text-gray-900">{LKR(it.price)}</div>
+                      <input
+                        type="text"
+                        value={it.label}
+                        placeholder="Service name"
+                        onChange={(e) => updateOtherService(idx, "label", e.target.value)}
+                        className="w-[100px] rounded border border-gray-300 bg-white px-2 py-1 text-xs outline-none focus:border-blue-500"
+                      />
+                      <input
+                        type="number"
+                        value={it.value || ""}
+                        placeholder="0"
+                        min={0}
+                        onChange={(e) => updateOtherService(idx, "value", e.target.value)}
+                        className="w-[80px] rounded border border-gray-300 bg-white px-2 py-1 text-xs font-semibold outline-none focus:border-blue-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeOtherService(idx)}
+                        className="text-gray-500 hover:text-red-600 text-sm leading-none"
+                        title="Remove"
+                      >
+                        ×
+                      </button>
                     </div>
                   ))}
                 </div>
-              )}
 
-              <div className="my-2 h-px bg-gray-200" />
-              <div className="flex items-center justify-between text-xs font-semibold text-gray-800">
-                <div>Total</div>
-                <div className="text-gray-900">{LKR(selectedTotal)}</div>
+                <button
+                  type="button"
+                  onClick={addOtherService}
+                  className="mt-2 text-[11px] font-semibold text-blue-600 hover:text-blue-700 underline"
+                >
+                  + Add service
+                </button>
+
+                <div className="my-2 h-px bg-gray-200" />
+                <div className="flex items-center justify-between text-xs font-semibold text-gray-800">
+                  <div>Total</div>
+                  <div className="text-gray-900">{LKR(otherTotal)}</div>
+                </div>
               </div>
-            </div>
 
-            <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
-              <div className="mb-2 text-xs font-semibold text-gray-800">Other Services</div>
+              <div className="my-3 h-px bg-gray-300" />
 
-              <div className="space-y-2">
-                {otherServices.map((it, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 text-xs"
-                  >
-                    <input
-                      type="text"
-                      value={it.label}
-                      placeholder="Service name"
-                      onChange={(e) => updateOtherService(idx, "label", e.target.value)}
-                      className="w-[100px] rounded border border-gray-300 bg-white px-2 py-1 text-xs outline-none focus:border-blue-500"
-                    />
-                    <input
-                      type="number"
-                      value={it.value || ""}
-                      placeholder="0"
-                      min={0}
-                      onChange={(e) => updateOtherService(idx, "value", e.target.value)}
-                      className="w-[80px] rounded border border-gray-300 bg-white px-2 py-1 text-xs font-semibold outline-none focus:border-blue-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeOtherService(idx)}
-                      className="text-gray-500 hover:text-red-600 text-sm leading-none"
-                      title="Remove"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+              <div className="flex items-center justify-between rounded-lg bg-blue-50 border border-blue-100 px-3 py-2 text-[13px] font-bold text-gray-900">
+                <div>TOTAL</div>
+                <div>{LKR(grandTotal)}</div>
               </div>
 
               <button
                 type="button"
-                onClick={addOtherService}
-                className="mt-2 text-[11px] font-semibold text-blue-600 hover:text-blue-700 underline"
+                onClick={downloadBudgetReport}
+                className="mt-4 w-full rounded-lg bg-blue-600 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 transition"
               >
-                + Add service
+                Download Report
               </button>
-
-              <div className="my-2 h-px bg-gray-200" />
-              <div className="flex items-center justify-between text-xs font-semibold text-gray-800">
-                <div>Total</div>
-                <div className="text-gray-900">{LKR(otherTotal)}</div>
-              </div>
             </div>
-
-            <div className="my-3 h-px bg-gray-300" />
-
-            <div className="flex items-center justify-between rounded-lg bg-blue-50 border border-blue-100 px-3 py-2 text-[13px] font-bold text-gray-900">
-              <div>TOTAL</div>
-              <div>{LKR(grandTotal)}</div>
-            </div>
-
-            <button
-              type="button"
-              onClick={downloadBudgetReport}
-              className="mt-4 w-full rounded-lg bg-blue-600 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 transition"
-            >
-              Download Report
-            </button>
           </div>
+
+          {/* Chatbot Overlay Component */}
+          <div className={`transition-all duration-300 absolute top-0 right-0 z-50 h-[650px] w-[700px] max-w-[calc(100vw-3rem)] origin-top-right ${isChatOpen ? 'opacity-100 pointer-events-auto scale-100 translate-y-0' : 'opacity-0 pointer-events-none scale-95 translate-y-4'}`}>
+              {isChatOpen && <ChatBotInterface onClose={() => setIsChatOpen(false)} />}
+          </div>
+
         </aside>
       </div>
 
@@ -506,8 +519,6 @@ const ServicesPage: React.FC = () => {
         </button>
 
         <div className="flex items-center gap-3">
-          
-
           <button
             onClick={onFinish}
             disabled={saving}
@@ -516,12 +527,15 @@ const ServicesPage: React.FC = () => {
             {saving ? "Saving..." : "Finish"}
           </button>
 
-          <button
-            onClick={() => toast.success("AI Support (hook up later)")}
-            className="rounded-full bg-violet-600 px-4 py-2 text-sm font-bold text-white shadow hover:bg-violet-700"
-          >
-             ✦ AI Support
-          </button>
+          {/* Hide the button when Chat is open */}
+          {!isChatOpen && (
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="rounded-full bg-violet-600 px-4 py-2 text-sm font-bold text-white shadow hover:bg-violet-700 transition-opacity duration-300"
+            >
+               ✦ AI Support
+            </button>
+          )}
         </div>
       </div>
     </div>

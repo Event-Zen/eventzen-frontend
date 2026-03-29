@@ -59,7 +59,7 @@ export default function AttendeeProfilePage() {
     if (raw) {
       try {
         u = JSON.parse(raw);
-      } catch {}
+      } catch { }
     }
     return {
       ...initialProfile,
@@ -104,26 +104,27 @@ export default function AttendeeProfilePage() {
         name: form.name,
         phone: form.phone,
         address: form.location,
+        profileImageUrl: form.avatarUrl,
       });
 
       if (res.user) {
         setForm({
-            name: res.user.name || "",
-            email: res.user.email || "",
-            phone: res.user.phone || "",
-            location: res.user.address || "",
-            avatarUrl: res.user.profileImageUrl || form.avatarUrl,
+          name: res.user.name || "",
+          email: res.user.email || "",
+          phone: res.user.phone || "",
+          location: res.user.address || "",
+          avatarUrl: res.user.profileImageUrl || form.avatarUrl,
         });
 
         // Update localStorage
         const raw = localStorage.getItem("user");
         if (raw) {
-            const currentUser = JSON.parse(raw);
-            localStorage.setItem("user", JSON.stringify({
-                ...currentUser,
-                name: res.user.name,
-                email: res.user.email
-            }));
+          const currentUser = JSON.parse(raw);
+          localStorage.setItem("user", JSON.stringify({
+            ...currentUser,
+            name: res.user.name,
+            email: res.user.email
+          }));
         }
 
         toast.success("Profile saved!");
@@ -139,6 +140,17 @@ export default function AttendeeProfilePage() {
     console.log("Edit event:", id);
     toast(`Edit event: ${id}`);
   }
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateField("avatarUrl", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   function handleCreateEvent() {
     // TODO: navigate to create event page (e.g., /events/create)
@@ -175,14 +187,13 @@ export default function AttendeeProfilePage() {
               )}
 
               {/* small edit icon circle */}
-              <button
-                type="button"
-                className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm"
-                onClick={() => toast("Avatar edit (optional)")}
+              <label
+                className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm cursor-pointer"
                 aria-label="Edit avatar"
               >
-                <Pencil size={12} />
-              </button>
+                <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
+                <Pencil size={12} className="text-gray-600" />
+              </label>
             </div>
 
             <div className="leading-tight">

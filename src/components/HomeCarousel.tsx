@@ -41,7 +41,8 @@ const slides: Slide[] = [
 
 const HomeCarousel = () => {
   const { user } = useAuthUser();
-  const [carouselSlides, setCarouselSlides] = useState<Slide[]>(slides);
+  const [carouselSlides, setCarouselSlides] = useState<Slide[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadEvents() {
@@ -71,9 +72,14 @@ const HomeCarousel = () => {
             };
           });
           setCarouselSlides(newSlides);
+        } else {
+          setCarouselSlides(slides);
         }
       } catch (err) {
         console.error("Failed to load carousel events", err);
+        setCarouselSlides(slides);
+      } finally {
+        setLoading(false);
       }
     }
     loadEvents();
@@ -82,6 +88,15 @@ const HomeCarousel = () => {
   const isAttendee = user?.role === "ATTENDEE";
   const isPlanner = user?.role === "PLANNER";
   const isVendor = user?.role === "VENDOR";
+
+  if (loading) {
+    return (
+      <section className="w-full h-[420px] md:h-[520px] bg-slate-800 animate-pulse flex flex-col items-center justify-center">
+        <div className="h-10 w-64 bg-slate-700 rounded-md mb-6"></div>
+        <div className="h-6 w-96 bg-slate-700 rounded-md"></div>
+      </section>
+    );
+  }
 
   return (
     <section className="w-full">

@@ -101,14 +101,14 @@ function dedupeById(items: any[]) {
 function hasVendorIdentityFields(service: any) {
   return Boolean(
     service?.vendorId ||
-      service?.vendor?._id ||
-      service?.vendor?.id ||
-      service?.ownerId ||
-      service?.createdBy ||
-      service?.createdById ||
-      service?.userId ||
-      service?.vendorEmail ||
-      service?.vendor?.email,
+    service?.vendor?._id ||
+    service?.vendor?.id ||
+    service?.ownerId ||
+    service?.createdBy ||
+    service?.createdById ||
+    service?.userId ||
+    service?.vendorEmail ||
+    service?.vendor?.email,
   );
 }
 
@@ -269,6 +269,7 @@ export default function VendorProfilePage() {
         name: draft.name,
         phone: draft.mobile,
         address: draft.location,
+        profileImageUrl: draft.avatarUrl !== vendor.avatarUrl ? draft.avatarUrl : undefined,
       });
 
       if (res.user) {
@@ -280,17 +281,17 @@ export default function VendorProfilePage() {
           avatarUrl: res.user.profileImageUrl || "",
         };
         setVendor(updatedVendor);
-        
+
         // Update localStorage to keep basic info in sync
         const currentUser = readAuthUser();
         if (currentUser) {
-            localStorage.setItem("user", JSON.stringify({
-                ...currentUser,
-                name: res.user.name,
-                email: res.user.email
-            }));
+          localStorage.setItem("user", JSON.stringify({
+            ...currentUser,
+            name: res.user.name,
+            email: res.user.email
+          }));
         }
-        
+
         toast.success("Profile updated successfully");
       }
       setIsEditing(false);
@@ -302,6 +303,17 @@ export default function VendorProfilePage() {
 
   const onEditService = (id: string) => {
     navigate(`/vendor/edit-service/${id}`);
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setDraft(p => ({ ...p, avatarUrl: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // If no avatar, Showing Vender name initials
@@ -332,15 +344,27 @@ export default function VendorProfilePage() {
           <div className="rounded-2xl bg-white p-8 shadow-lg border border-gray-100">
             <div className="relative flex items-center justify-center pb-6">
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 flex items-center justify-center rounded-full bg-slate-300 text-slate-700 font-semibold text-sm overflow-hidden">
-                  {vendor.avatarUrl ? (
-                    <img
-                      src={vendor.avatarUrl}
-                      alt="Vendor avatar"
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    getInitials(vendor.name)
+                <div className="relative">
+                  <div className="h-14 w-14 flex items-center justify-center rounded-full bg-slate-300 text-slate-700 font-semibold text-sm overflow-hidden">
+                    {(isEditing ? draft.avatarUrl : vendor.avatarUrl) ? (
+                      <img
+                        src={isEditing ? draft.avatarUrl : vendor.avatarUrl}
+                        alt="Vendor avatar"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      getInitials(isEditing ? draft.name : vendor.name)
+                    )}
+                  </div>
+
+                  {isEditing && (
+                    <label
+                      className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm cursor-pointer"
+                      title="Upload new avatar"
+                    >
+                      <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
+                      <Pencil className="h-3 w-3 text-slate-600" />
+                    </label>
                   )}
                 </div>
 

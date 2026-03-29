@@ -207,6 +207,7 @@ export default function PlannerProfilePage() {
         name: draft.name,
         phone: draft.mobile,
         address: draft.location,
+        profileImageUrl: draft.avatarUrl !== planner.avatarUrl ? draft.avatarUrl : undefined,
       });
 
       if (res.user) {
@@ -239,6 +240,17 @@ export default function PlannerProfilePage() {
     } catch (err) {
       console.error("Failed to update profile", err);
       toast.error("Failed to update profile");
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setDraft(p => ({ ...p, avatarUrl: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -340,15 +352,27 @@ export default function PlannerProfilePage() {
           {/* Header row */}
           <div className="relative flex items-center justify-center pb-6">
             <div className="flex items-center gap-4">
-              <div className="h-14 w-14 flex items-center justify-center rounded-full bg-slate-300 text-slate-700 font-semibold text-sm overflow-hidden">
-                {planner.avatarUrl ? (
-                  <img
-                    src={planner.avatarUrl}
-                    alt="Planner avatar"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  getInitials(planner.name)
+              <div className="relative">
+                <div className="h-14 w-14 flex items-center justify-center rounded-full bg-slate-300 text-slate-700 font-semibold text-sm overflow-hidden">
+                  {(isEditing ? draft.avatarUrl : planner.avatarUrl) ? (
+                    <img
+                      src={isEditing ? draft.avatarUrl : planner.avatarUrl}
+                      alt="Planner avatar"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    getInitials(isEditing ? draft.name : planner.name)
+                  )}
+                </div>
+
+                {isEditing && (
+                  <label
+                    className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm cursor-pointer"
+                    title="Upload new avatar"
+                  >
+                    <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
+                    <Pencil className="h-3 w-3 text-slate-600" />
+                  </label>
                 )}
               </div>
 

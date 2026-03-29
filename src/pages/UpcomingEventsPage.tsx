@@ -8,6 +8,7 @@ type EventItem = {
   title: string;
   description: string;
   ticketPrice: string;
+  rawPrice: number;
   image?: string;
 };
 
@@ -49,6 +50,7 @@ export default function UpcomingEventsPage() {
         const mappedEvents: EventItem[] = data.map((ev: BackendEvent, i: number) => {
           let displayDesc = ev.description || "";
           let price = "Free";
+          let rawPrice = 0;
 
           if (displayDesc.includes(" | Capacity: ")) {
             const parts = displayDesc.split(" | ");
@@ -58,7 +60,8 @@ export default function UpcomingEventsPage() {
             if (pricePart) {
               const priceVal = pricePart.replace("Price: ", "").trim();
               if (priceVal && priceVal !== "Free" && priceVal !== "0") {
-                price = `Rs. ${Number(priceVal).toLocaleString("en-LK", { minimumFractionDigits: 2 })}`;
+                rawPrice = Number(priceVal);
+                price = `Rs. ${rawPrice.toLocaleString("en-LK", { minimumFractionDigits: 2 })}`;
               }
             }
           }
@@ -68,6 +71,7 @@ export default function UpcomingEventsPage() {
             title: ev.title,
             description: displayDesc,
             ticketPrice: price,
+            rawPrice: rawPrice,
             image: ev.imageBase64 || ev.image || `/images/events/event${(i % 6) + 1}.jpg`,
           };
         });
@@ -81,9 +85,9 @@ export default function UpcomingEventsPage() {
     fetchEvents();
   }, []);
 
-  const onBuy = (eventId: string) => {
-    console.log("Selected event:", eventId);
-    navigate("/payment");
+  const onBuy = (event: EventItem) => {
+    console.log("Selected event:", event.id);
+    navigate("/payment", { state: { eventId: event.id, amount: event.rawPrice || 50 } });
   };
 
   if (loading) {
@@ -145,7 +149,7 @@ export default function UpcomingEventsPage() {
 
                   <button
                     type="button"
-                    onClick={() => isAttendee && onBuy(event.id)}
+                    onClick={() => isAttendee && onBuy(event)}
                     disabled={!isAttendee}
                     title={!isAttendee ? "Only attendees can purchase tickets" : ""}
                     className={`rounded-md px-4 py-2 text-xs font-semibold text-white transition-all

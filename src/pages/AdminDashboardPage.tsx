@@ -116,7 +116,6 @@ export default function AdminDashboardPage() {
 
   const stats = useMemo(() => {
     const safeUsers = Array.isArray(users) ? users : [];
-    const safeServices = Array.isArray(services) ? services : [];
     const safeEvents = Array.isArray(events) ? events : [];
 
     const revenue = safeEvents.reduce((sum, e) => sum + (e.budget?.platformFee || 0), 0);

@@ -3,6 +3,8 @@ import { Pencil } from "lucide-react";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
 import { getMeApi, updateMeApi } from "../features/auth/api/auth.api";
 import { toast } from "react-hot-toast";
+import { useAuthUser } from "../features/auth/hooks/useAuthUser";
+import { getEventById } from "../shared/api/eventClient";
 
 type ProfileForm = {
   name: string;
@@ -24,26 +26,8 @@ const initialProfile: ProfileForm = {
   email: "kasun@gmail.com",
   phone: "(+94)77 1212654",
   location: "Weligama, Matara",
-  avatarUrl:
-    "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=200&q=80",
+  avatarUrl: "",
 };
-
-const initialEvents: EventItem[] = [
-  {
-    id: "1",
-    title: "Gala Night Extravaganza",
-    description:
-      "A glamorous evening filled with live music, exquisite dining, and dancing. Perfect for corporate gatherings or charity fundraisers",
-    progress: "Completed",
-  },
-  {
-    id: "2",
-    title: "Foodie Fest",
-    description:
-      "A culinary festival showcasing a variety of food trucks, local restaurants, and gourmet chefs. Attendees can enjoy tastings, cooking demos, and food-related workshops.",
-    progress: "Up Coming",
-  },
-];
 
 function initialsFromName(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -53,6 +37,7 @@ function initialsFromName(name: string) {
 }
 
 export default function AttendeeProfilePage() {
+  const { user } = useAuthUser();
   const [form, setForm] = useState<ProfileForm>(() => {
     const raw = localStorage.getItem("user");
     let u: any = {};
@@ -90,7 +75,59 @@ export default function AttendeeProfilePage() {
     }
     fetchProfile();
   }, []);
-  const [events] = useState<EventItem[]>(initialEvents);
+
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+  useEffect(() => {
+    async function fetchPurchasedEvents() {
+      if (!user?.id) {
+        setLoadingEvents(false);
+        return;
+      }
+      try {
+        setLoadingEvents(true);
+        // fetch payments
+        const res = await fetch(`http://localhost:3003/api/payments/user/${user.id}`);
+        const data = await res.json();
+        const eventIds: string[] = data.data || [];
+        
+        // fetch event details
+        const fetchedEvents = await Promise.all(
+          eventIds.map(async (id) => {
+            try {
+              const evRes = await getEventById(id);
+              return evRes.data || evRes;
+            } catch (err) {
+              console.error(`Failed to fetch event ${id}`, err);
+              return null;
+            }
+          })
+        );
+        
+        const validEvents = fetchedEvents.filter(Boolean);
+        const now = new Date();
+        
+        const mapped: EventItem[] = validEvents.map((ev: any) => {
+          const endDateTime = new Date(ev.endDateTime);
+          const isCompleted = endDateTime < now;
+          return {
+            id: ev._id || ev.id,
+            title: ev.title || "Untitled Event",
+            description: ev.description || "No description provided.",
+            progress: isCompleted ? "Completed" : "Up Coming",
+          };
+        });
+        
+        setEvents(mapped);
+      } catch (err) {
+        console.error("Failed to fetch attendee events", err);
+      } finally {
+        setLoadingEvents(false);
+      }
+    }
+    fetchPurchasedEvents();
+  }, [user?.id]);
 
   const avatarFallback = useMemo(() => initialsFromName(form.name), [form.name]);
 
@@ -262,7 +299,11 @@ export default function AttendeeProfilePage() {
           </div>
 
           <div className="space-y-4">
-            {events.map((ev) => (
+            {loadingEvents ? (
+              <div className="text-gray-500 font-medium animate-pulse text-center">Loading your events...</div>
+            ) : events.length === 0 ? (
+              <div className="text-gray-500 text-center py-4">You haven't purchased any events yet.</div>
+            ) : events.map((ev) => (
               <div
                 key={ev.id}
                 className="relative rounded-lg bg-gray-200/80 p-4"

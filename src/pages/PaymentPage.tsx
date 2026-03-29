@@ -4,6 +4,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { updateEvent } from "../shared/api/eventClient";
 import { toast } from "react-hot-toast";
+import { useAuthUser } from "../features/auth/hooks/useAuthUser";
 
 // Load Stripe outside of components to avoid recreating the object
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "", {
@@ -75,12 +76,14 @@ function CheckoutForm({ eventId }: { eventId: string | null }) {
 export default function PaymentPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuthUser();
   const [clientSecret, setClientSecret] = useState<string>("");
   const [initialError, setInitialError] = useState("");
 
   // Get eventId from router state or sessionStorage
   const eventId: string | null =
     (location.state as any)?.eventId || sessionStorage.getItem("activeEventId");
+  const amount = Number((location.state as any)?.amount) || 50;
 
   useEffect(() => {
     // Connect to backend to create intent and fetch secret on load
@@ -91,8 +94,8 @@ export default function PaymentPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             eventId: eventId || "evt_unknown",
-            userId: "usr_456",
-            amount: 50,
+            userId: user?.id || (user as any)?._id || "usr_fallback",
+            amount,
             currency: "usd",
           }),
         });

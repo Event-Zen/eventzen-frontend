@@ -158,7 +158,8 @@ const HomeCarousel = () => {
                     )}
                     {(isAttendee && slide.eventId) && (
                       <Link
-                        to="/payment" // or actual event view page if implemented
+                        to="/payment"
+                        state={{ eventId: slide.eventId }}
                         className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold transition inline-block"
                       >
                         Buy Tickets

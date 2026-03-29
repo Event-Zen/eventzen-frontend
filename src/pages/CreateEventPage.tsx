@@ -25,6 +25,7 @@ type FormState = {
   eventType: string;
   capacity: string;
   ticketPrice: string;
+  imageBase64: string | null;
 };
 
 const EVENT_TYPES = [
@@ -217,6 +218,7 @@ export default function CreateEventPage() {
       eventType: "Selection",
       capacity: "",
       ticketPrice: "",
+      imageBase64: null,
     };
   });
 
@@ -259,7 +261,19 @@ export default function CreateEventPage() {
         locationType: form.eventMode === "virtual" ? "online" : "physical",
         location: form.location,
         status: "draft",
+        imageBase64: form.imageBase64,
       };
+
+      if (!form.date) {
+        setError("Please select an event date.");
+        setLoading(false);
+        return;
+      }
+      if (!form.imageBase64) {
+        setError("Please upload an event banner image.");
+        setLoading(false);
+        return;
+      }
 
       const activeId = sessionStorage.getItem("activeEventId");
       let eventId = activeId;
@@ -307,9 +321,10 @@ export default function CreateEventPage() {
               {/* Event Title */}
               <div>
                 <label className="block text-xs text-slate-700">
-                  Event Title
+                  Event Title <span className="text-red-500">*</span>
                 </label>
                 <input
+                  required
                   value={form.title}
                   onChange={(e) => setField("title", e.target.value)}
                   className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-400"
@@ -319,9 +334,10 @@ export default function CreateEventPage() {
               {/* Description */}
               <div>
                 <label className="block text-xs text-slate-700">
-                  Description
+                  Description <span className="text-red-500">*</span>
                 </label>
                 <input
+                  required
                   value={form.description}
                   onChange={(e) => setField("description", e.target.value)}
                   className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-400"
@@ -330,8 +346,11 @@ export default function CreateEventPage() {
 
               {/* Location */}
               <div>
-                <label className="block text-xs text-slate-700">Location</label>
+                <label className="block text-xs text-slate-700">
+                  Location <span className="text-red-500">*</span>
+                </label>
                 <select
+                  required
                   value={form.location}
                   onChange={(e) => setField("location", e.target.value)}
                   className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
@@ -347,7 +366,9 @@ export default function CreateEventPage() {
 
               {/* Date */}
               <div>
-                <label className="block text-xs text-slate-700">Date</label>
+                <label className="block text-xs text-slate-700">
+                  Date <span className="text-red-500">*</span>
+                </label>
                 <div className="mt-2">
                   <InlineCalendar
                     value={form.date}
@@ -358,7 +379,9 @@ export default function CreateEventPage() {
 
               {/* Time */}
               <div>
-                <label className="block text-xs text-slate-700">Time</label>
+                <label className="block text-xs text-slate-700">
+                  Time <span className="text-red-500">*</span>
+                </label>
 
                 <div className="mt-1 grid grid-cols-2 gap-3">
                   <div>
@@ -366,6 +389,7 @@ export default function CreateEventPage() {
                       From
                     </label>
                     <input
+                      required
                       type="time"
                       value={form.startTime}
                       onChange={(e) => setField("startTime", e.target.value)}
@@ -378,6 +402,7 @@ export default function CreateEventPage() {
                       To
                     </label>
                     <input
+                      required
                       type="time"
                       value={form.endTime}
                       onChange={(e) => setField("endTime", e.target.value)}
@@ -422,9 +447,10 @@ export default function CreateEventPage() {
               {/* Event Type */}
               <div>
                 <label className="block text-xs text-slate-700">
-                  Event Type
+                  Event Type <span className="text-red-500">*</span>
                 </label>
                 <select
+                  required
                   value={form.eventType}
                   onChange={(e) => setField("eventType", e.target.value)}
                   className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
@@ -440,9 +466,10 @@ export default function CreateEventPage() {
               {/* Attendee Capacity */}
               <div>
                 <label className="block text-xs text-slate-700">
-                  Attendee Capacity
+                  Attendee Capacity <span className="text-red-500">*</span>
                 </label>
                 <input
+                  required
                   type="number"
                   min={1}
                   value={form.capacity}
@@ -454,15 +481,46 @@ export default function CreateEventPage() {
               {/* Ticket Price */}
               <div>
                 <label className="block text-xs text-slate-700">
-                  Ticket Price
+                  Ticket Price <span className="text-red-500">*</span>
                 </label>
                 <input
+                  required
                   type="number"
                   min={0}
                   value={form.ticketPrice}
                   onChange={(e) => setField("ticketPrice", e.target.value)}
                   className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-400"
                 />
+              </div>
+
+              {/* Event Image Banner */}
+              <div>
+                <label className="block text-xs text-slate-700">
+                  Event Image Banner <span className="text-red-500">*</span>
+                </label>
+                <input
+                  required
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setField("imageBase64", reader.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    } else {
+                      setField("imageBase64", null);
+                    }
+                  }}
+                  className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm outline-none bg-white file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                {form.imageBase64 && (
+                  <div className="mt-2 text-xs text-green-600 font-semibold">
+                    ✓ Image selected successfully ({(form.imageBase64.length / 1024).toFixed(1)} KB)
+                  </div>
+                )}
               </div>
 
               {/* Bottom buttons like screenshot */}

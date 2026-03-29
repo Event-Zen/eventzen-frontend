@@ -2,6 +2,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation, EffectFade } from "swiper/modules";
 import { Link } from "react-router-dom";
 import { useAuthUser } from "../features/auth/hooks/useAuthUser";
+import { useState, useEffect } from "react";
+import { listPublishedEvents } from "../shared/api/eventClient";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -13,6 +15,7 @@ type Slide = {
   image: string;
   title: string;
   subtitle: string;
+  eventId?: string;
 };
 
 const slides: Slide[] = [
@@ -38,6 +41,43 @@ const slides: Slide[] = [
 
 const HomeCarousel = () => {
   const { user } = useAuthUser();
+  const [carouselSlides, setCarouselSlides] = useState<Slide[]>(slides);
+
+  useEffect(() => {
+    async function loadEvents() {
+      try {
+        const response = await listPublishedEvents();
+        const data = response.data || [];
+        if (data.length > 0) {
+          // Sort by newest first, take top 5
+          const sorted = [...data].sort((a: any, b: any) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+          const top5 = sorted.slice(0, 5);
+          
+          const newSlides: Slide[] = top5.map((ev: any, i: number) => {
+            let desc = ev.description || "Join us for this exciting event.";
+            if (desc.includes(" | Capacity: ")) {
+              desc = desc.split(" | ")[0]; // clean up backend string
+            }
+            if (desc.length > 80) desc = desc.substring(0, 80) + "...";
+            
+            return {
+              id: ev._id || i, // Use _id but fallback to array index
+              eventId: ev._id,
+              image: ev.imageBase64 || ev.image || `/images/events/event${(i % 6) + 1}.jpg`,
+              title: ev.title?.toUpperCase() || "EVENT",
+              subtitle: desc.toUpperCase(),
+            };
+          });
+          setCarouselSlides(newSlides);
+        }
+      } catch (err) {
+        console.error("Failed to load carousel events", err);
+      }
+    }
+    loadEvents();
+  }, []);
 
   const isAttendee = user?.role === "ATTENDEE";
   const isPlanner = user?.role === "PLANNER";
@@ -54,7 +94,7 @@ const HomeCarousel = () => {
         navigation
         className="w-full h-[420px] md:h-[520px]"
       >
-        {slides.map((slide) => (
+        {carouselSlides.map((slide) => (
           <SwiperSlide key={slide.id}>
             <div className="relative w-full h-[420px] md:h-[520px]">
               {/* Background Image */}
@@ -104,6 +144,14 @@ const HomeCarousel = () => {
                         className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-semibold transition inline-block"
                       >
                         Add Service
+                      </Link>
+                    )}
+                    {(isAttendee && slide.eventId) && (
+                      <Link
+                        to="/payment" // or actual event view page if implemented
+                        className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold transition inline-block"
+                      >
+                        Buy Tickets
                       </Link>
                     )}
                   </div>

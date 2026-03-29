@@ -16,6 +16,7 @@ type BackendEvent = {
   title: string;
   description?: string;
   image?: string;
+  imageBase64?: string;
 };
 
 export default function UpcomingEventsPage() {
@@ -67,7 +68,7 @@ export default function UpcomingEventsPage() {
             title: ev.title,
             description: displayDesc,
             ticketPrice: price,
-            image: ev.image || `/images/events/event${(i % 6) + 1}.jpg`,
+            image: ev.imageBase64 || ev.image || `/images/events/event${(i % 6) + 1}.jpg`,
           };
         });
         setUpcomingEvents(mappedEvents);

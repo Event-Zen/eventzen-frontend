@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { getMyEvents, getEventById } from "../shared/api/eventClient";
 import GoogleCalendarButton from "../components/GoogleCalendarButton";
 import GoogleMeetButton from "../components/GoogleMeetButton";
+import FacebookPromotionButton from "../components/FacebookPromotionButton";
+import InstagramPromotionButton from "../components/InstagramPromotionButton";
 import { getMeApi, updateMeApi } from "../features/auth/api/auth.api";
 import { toast } from "react-hot-toast";
 
@@ -402,11 +404,13 @@ export default function PlannerProfilePage() {
               Integration Tools
             </h3>
             <p className="mb-4 text-xs text-slate-600">
-              Sync your events and schedule video meetings directly.
+              Sync your events, schedule meetings, and promote on social media.
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <GoogleCalendarButton />
               <GoogleMeetButton />
+              <FacebookPromotionButton />
+              <InstagramPromotionButton />
             </div>
           </div>
         </div>

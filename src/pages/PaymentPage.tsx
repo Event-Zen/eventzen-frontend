@@ -11,7 +11,7 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "", {
   developerTools: { assistant: { enabled: false } }
 });
 
-function CheckoutForm({ eventId }: { eventId: string | null }) {
+function CheckoutForm({ eventId, userEmail, userRole }: { eventId: string | null; userEmail: string; userRole: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -42,13 +42,34 @@ function CheckoutForm({ eventId }: { eventId: string | null }) {
         }
       }
 
+      // Send ticket email via ticketing service
+      if (userEmail && eventId) {
+        try {
+          const ticketingUrl = import.meta.env.VITE_TICKETING_SERVICE_URL || "http://localhost:4002";
+          await fetch(`${ticketingUrl}/api/tickets/purchase`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: userEmail, eventId }),
+          });
+          console.log("Ticket email dispatched to", userEmail);
+        } catch (emailErr) {
+          console.error("Failed to send ticket email:", emailErr);
+        }
+      }
+
       // Clean up sessionStorage
       sessionStorage.removeItem("createEventForm");
       sessionStorage.removeItem("activeEventId");
       sessionStorage.removeItem("serviceSelections");
 
       toast.success(`Success! Payment was securely confirmed by Stripe. \nStripe Output ID: ${paymentIntent.id}`);
-      navigate("/planner-profile"); // Redirect to planner profile to see updated status
+
+      // Navigate to the correct profile based on user role
+      if (userRole === "ATTENDEE") {
+        navigate("/attendee-profile");
+      } else {
+        navigate("/planner-profile");
+      }
     }
     setIsProcessing(false);
   };
@@ -162,7 +183,7 @@ export default function PaymentPage() {
               </div>
             ) : clientSecret ? (
               <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <CheckoutForm eventId={eventId} />
+                <CheckoutForm eventId={eventId} userEmail={user?.email || ""} userRole={user?.role || ""} />
               </Elements>
             ) : (
               <div className="mt-8 flex flex-col justify-center items-center py-10 space-y-4">

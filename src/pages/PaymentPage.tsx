@@ -110,7 +110,8 @@ export default function PaymentPage() {
     // Connect to backend to create intent and fetch secret on load
     const fetchIntent = async () => {
       try {
-        const response = await fetch("http://localhost:3003/api/payments/create-intent", {
+        const paymentUrl = import.meta.env.VITE_PAYMENT_SERVICE_URL || "http://localhost:3003";
+        const response = await fetch(`${paymentUrl}/api/payments/create-intent`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -179,7 +180,7 @@ export default function PaymentPage() {
             {initialError ? (
               <div className="mt-8 rounded-lg bg-red-100 p-4 border border-red-300">
                 <p className="text-red-700 font-semibold">Error: {initialError}</p>
-                <p className="text-sm mt-1 text-red-600">Please make sure your payment-service (localhost:3003) is running.</p>
+                <p className="text-sm mt-1 text-red-600">Please make sure your payment-service is running.</p>
               </div>
             ) : clientSecret ? (
               <Elements stripe={stripePromise} options={{ clientSecret }}>

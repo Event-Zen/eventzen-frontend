@@ -88,7 +88,8 @@ export default function AttendeeProfilePage() {
       try {
         setLoadingEvents(true);
         // fetch payments
-        const res = await fetch(`http://localhost:3003/api/payments/user/${user.id}`);
+        const paymentUrl = import.meta.env.VITE_PAYMENT_SERVICE_URL || "http://localhost:3003";
+        const res = await fetch(`${paymentUrl}/api/payments/user/${user.id}`);
         const data = await res.json();
         const eventIds: string[] = data.data || [];
         

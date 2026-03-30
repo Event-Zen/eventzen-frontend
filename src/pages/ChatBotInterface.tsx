@@ -31,8 +31,9 @@ export default function ChatBotInterface({
     const fetchRecentChats = async () => {
       if (!user?.id) return;
       try {
+        const reportingUrl = import.meta.env.VITE_REPORTING_SERVICE_URL || "http://localhost:5009";
         const response = await fetch(
-          `http://localhost:5009/api/chatbot/user/${user.id}`,
+          `${reportingUrl}/api/chatbot/user/${user.id}`,
         );
         if (response.ok) {
           const data = await response.json();
@@ -70,7 +71,8 @@ export default function ChatBotInterface({
     setMessages((prev) => [...prev, tempUserMessage]);
 
     try {
-      const response = await fetch("http://localhost:5009/api/chatbot/send", {
+      const reportingUrl = import.meta.env.VITE_REPORTING_SERVICE_URL || "http://localhost:5009";
+      const response = await fetch(`${reportingUrl}/api/chatbot/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,8 +108,9 @@ export default function ChatBotInterface({
     if (!chatId) return;
 
     try {
+      const reportingUrl = import.meta.env.VITE_REPORTING_SERVICE_URL || "http://localhost:5009";
       const response = await fetch(
-        `http://localhost:5009/api/chatbot/chat/${chatId}`,
+        `${reportingUrl}/api/chatbot/chat/${chatId}`,
       );
       if (!response.ok) {
         console.error("Failed to load chat", response.statusText);
